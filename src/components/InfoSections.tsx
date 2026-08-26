@@ -142,7 +142,7 @@ export default function InfoSections({ onBrowseMascotas }: InfoSectionsProps) {
                 <div className="absolute inset-0 bg-gradient-to-r from-moss-950/85 via-moss-950/40 to-transparent" />
                 <div className="absolute inset-0 flex flex-col justify-center px-6 sm:px-9">
                   <p className="font-mono text-[10px] tracking-[0.24em] text-amber-300 uppercase">La línea completa</p>
-                  <p className="mt-2 max-w-sm font-display text-2xl leading-snug text-moss-900 sm:text-3xl" style={{ color: "#f8f6ec" }}>
+                  <p className="mt-2 max-w-sm font-display text-2xl leading-snug text-moss-900 sm:text-3xl">
                     25, 50 y 100 ml para ti;
                     <em className="text-amber-300"> 50 ml para ellos.</em>
                   </p>
