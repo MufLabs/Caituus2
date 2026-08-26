@@ -24,7 +24,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-40">
-      <div className="overflow-hidden bg-leaf-700 text-moss-900">
+      <div className="overflow-hidden bg-leaf-700 text-cream-100">
         <div className="marquee relative flex whitespace-nowrap">
           <div className="animate-marquee marquee-track flex items-center gap-10 py-2 pr-10 font-mono text-[10px] font-bold tracking-[0.22em] uppercase">
             {[0, 1].map((dup) => (

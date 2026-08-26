@@ -1,5 +1,6 @@
 import { CATEGORY_LABELS, money, type Product } from "../data/products";
 import { useShop } from "../state/shop";
+import SafeImg from "./SafeImg";
 import { HeartIcon, PlusIcon, StarIcon } from "./icons";
 
 const BADGE_TONES: Record<string, string> = {
@@ -22,9 +23,10 @@ export default function ProductCard({ product, onOpen }: ProductCardProps) {
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-lg border border-moss-700 bg-moss-850 transition-all duration-300 hover:-translate-y-1 hover:border-leaf-500/70 hover:shadow-[0_24px_48px_-24px_rgba(43,50,42,0.4)]">
       <div className="relative cursor-pointer overflow-hidden" onClick={() => onOpen(product)}>
-        <div className="aspect-[4/5] overflow-hidden bg-white">
-          <img
+        <div className="photo-plate aspect-[4/5] overflow-hidden">
+          <SafeImg
             src={product.image}
+            fallback={product.fallback}
             alt={`${product.name} — ${product.tagline}`}
             loading="lazy"
             className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"

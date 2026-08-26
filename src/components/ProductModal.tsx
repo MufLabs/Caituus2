@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { CATEGORY_LABELS, LEGAL, money, type Product } from "../data/products";
+import SafeImg from "./SafeImg";
 import { useShop } from "../state/shop";
 import { DropIcon, FlaskIcon, MinusIcon, MoonIcon, PlusIcon, ShieldIcon, StarIcon, XIcon } from "./icons";
 
@@ -43,8 +44,8 @@ export default function ProductModal({ product, onClose }: ProductModalProps) {
 
         <div className="grid sm:grid-cols-[0.85fr_1.15fr]">
           <div className="relative">
-            <div className="aspect-[4/5] overflow-hidden bg-white sm:h-full">
-              <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
+            <div className="photo-plate aspect-[4/5] overflow-hidden sm:h-full">
+              <SafeImg src={product.image} fallback={product.fallback} alt={product.name} className="h-full w-full object-cover" loading="eager" />
             </div>
             {product.badge && (
               <span className="absolute top-4 left-4 rounded-full border border-moss-600 bg-moss-900/90 px-3 py-1.5 font-mono text-[9px] tracking-[0.2em] text-leaf-300 uppercase">

@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { PRODUCTS, money } from "../data/products";
+import SafeImg from "./SafeImg";
 import { useShop } from "../state/shop";
 import {
   ArrowRightIcon,
@@ -96,10 +97,11 @@ export default function CartDrawer({ onCheckout }: CartDrawerProps) {
                 if (!product) return null;
                 return (
                   <li key={line.productId} className="flex gap-4 border-b border-moss-700/70 pb-5">
-                    <img
+                    <SafeImg
                       src={product.image}
+                      fallback={product.fallback}
                       alt={product.name}
-                      className="h-24 w-20 shrink-0 rounded-md border border-moss-700 bg-white object-cover"
+                      className="photo-plate h-24 w-20 shrink-0 rounded-md border border-moss-700 object-cover"
                     />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-3">

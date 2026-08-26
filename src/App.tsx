@@ -49,6 +49,11 @@ function AppContent() {
     };
   }, [overlayOpen]);
 
+  useEffect(() => {
+    const done = (window as unknown as { __CAITUUS_MOUNTED__?: () => void }).__CAITUUS_MOUNTED__;
+    if (typeof done === "function") done();
+  }, []);
+
   const clearFilters = () => {
     setQuery("");
     setCategory("all");
