@@ -1,51 +1,43 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: "Fraunces", "Georgia", serif;
+  --font-display: "Instrument Serif", "Georgia", serif;
   --font-body: "Karla", "Trebuchet MS", sans-serif;
   --font-mono: "Space Mono", "Courier New", monospace;
 
-  --color-bark-950: #100a06;
-  --color-bark-900: #171009;
-  --color-bark-850: #1c140c;
-  --color-bark-800: #231910;
-  --color-bark-700: #2e2115;
-  --color-bark-600: #3d2d1c;
-  --color-bark-500: #55402a;
+  --color-moss-950: #0b130c;
+  --color-moss-900: #101a11;
+  --color-moss-850: #142116;
+  --color-moss-800: #1a2b1d;
+  --color-moss-700: #233626;
+  --color-moss-600: #33503a;
+  --color-moss-500: #47694f;
 
-  --color-sand-100: #f6eddd;
-  --color-sand-200: #ede1cb;
-  --color-sand-300: #decdac;
+  --color-cream-100: #f5f1e4;
+  --color-cream-200: #ece7d5;
+  --color-cream-300: #ded7bf;
 
-  --color-latte-300: #cbb593;
-  --color-latte-400: #b59c78;
-  --color-latte-500: #9a8261;
-  --color-latte-600: #7e694d;
+  --color-leaf-300: #b9d3a4;
+  --color-leaf-400: #9dbe83;
+  --color-leaf-500: #7fa365;
+  --color-leaf-600: #63854c;
+  --color-leaf-700: #4d6a3b;
 
-  --color-ember-300: #f2c585;
-  --color-ember-400: #e9b366;
-  --color-ember-500: #dea04c;
-  --color-ember-600: #c4843a;
-  --color-ember-700: #9e682c;
-
-  --color-copper-400: #cd7f49;
-  --color-copper-500: #b66633;
-  --color-copper-600: #965227;
-
-  --color-sage-300: #bcc9a0;
-  --color-sage-400: #a3b484;
-  --color-sage-500: #879a69;
-  --color-sage-600: #6c7d52;
+  --color-amber-300: #f2ce85;
+  --color-amber-400: #e8b960;
+  --color-amber-500: #dba545;
+  --color-amber-600: #bc8734;
+  --color-amber-700: #97692a;
 
   --color-clay-300: #eba489;
   --color-clay-400: #dd8260;
   --color-clay-500: #c66245;
 
-  --color-berry-400: #b07186;
-  --color-berry-500: #95566c;
+  --color-sky-400: #8fb3c7;
+  --color-sky-500: #6f98af;
 
-  --animate-marquee: marquee 32s linear infinite;
-  --animate-slowspin: slowspin 26s linear infinite;
+  --animate-marquee: marquee 34s linear infinite;
+  --animate-slowspin: slowspin 28s linear infinite;
   --animate-steam: steam 3.4s ease-in-out infinite;
   --animate-pop: pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
   --animate-rise: rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -53,6 +45,28 @@
   --animate-float: float 6s ease-in-out infinite;
   --animate-toastbar: toastbar 3.6s linear both;
   --animate-pulse-dot: pulsedot 1.6s ease-in-out infinite;
+  --animate-sway: sway 7s ease-in-out infinite;
+  --animate-panel-in: panelin 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-drawer-in: drawerin 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  @keyframes panelin {
+    from {
+      opacity: 0;
+      transform: translateY(28px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes drawerin {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: none;
+    }
+  }
 
   @keyframes marquee {
     from {
@@ -118,6 +132,15 @@
       transform: translateY(-9px);
     }
   }
+  @keyframes sway {
+    0%,
+    100% {
+      transform: rotate(-4deg) translateY(0);
+    }
+    50% {
+      transform: rotate(5deg) translateY(-6px);
+    }
+  }
   @keyframes toastbar {
     from {
       width: 100%;
@@ -144,16 +167,16 @@
     scroll-behavior: smooth;
   }
   body {
-    @apply bg-bark-900 font-body text-sand-100 antialiased;
+    @apply bg-moss-900 font-body text-cream-100 antialiased;
     background-image:
-      radial-gradient(1100px 520px at 88% -12%, rgba(222, 160, 76, 0.08), transparent 62%),
-      radial-gradient(900px 620px at -12% 28%, rgba(182, 102, 51, 0.07), transparent 60%),
-      radial-gradient(760px 540px at 52% 112%, rgba(135, 154, 105, 0.05), transparent 62%);
+      radial-gradient(1100px 540px at 88% -12%, rgba(157, 190, 131, 0.09), transparent 62%),
+      radial-gradient(900px 620px at -12% 30%, rgba(219, 165, 69, 0.06), transparent 60%),
+      radial-gradient(760px 540px at 52% 112%, rgba(127, 163, 101, 0.06), transparent 62%);
     background-attachment: fixed;
   }
   ::selection {
-    background: rgba(222, 160, 76, 0.35);
-    color: #f6eddd;
+    background: rgba(157, 190, 131, 0.35);
+    color: #f5f1e4;
   }
   h1,
   h2,
@@ -161,6 +184,7 @@
   h4 {
     @apply font-display;
     font-optical-sizing: auto;
+    letter-spacing: -0.01em;
   }
   button {
     cursor: pointer;
@@ -173,7 +197,7 @@
     inset: 0;
     z-index: 90;
     pointer-events: none;
-    opacity: 0.055;
+    opacity: 0.05;
     mix-blend-mode: overlay;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
   }
@@ -195,11 +219,11 @@
   }
 
   .field {
-    @apply w-full rounded-md border border-bark-600 bg-bark-900/80 px-3.5 py-2.5 text-sm text-sand-100 transition outline-none placeholder:text-latte-600;
+    @apply w-full rounded-md border border-moss-600 bg-moss-900/80 px-3.5 py-2.5 text-sm text-cream-100 transition outline-none placeholder:text-moss-500;
   }
   .field:focus {
-    border-color: var(--color-ember-500);
-    box-shadow: 0 0 0 3px rgba(222, 160, 76, 0.16);
+    border-color: var(--color-leaf-500);
+    box-shadow: 0 0 0 3px rgba(157, 190, 131, 0.16);
   }
   .field-invalid {
     border-color: var(--color-clay-500);
@@ -221,31 +245,6 @@
     transform: scale(0.96);
   }
 
-  .animate-drawer-in {
-    animation: drawer-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
-  @keyframes drawer-in {
-    from {
-      transform: translateX(102%);
-    }
-    to {
-      transform: none;
-    }
-  }
-  .animate-panel-in {
-    animation: panel-in 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
-  @keyframes panel-in {
-    from {
-      opacity: 0;
-      transform: translateY(18px) scale(0.97);
-    }
-    to {
-      opacity: 1;
-      transform: none;
-    }
-  }
-
   .scroll-slim::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -254,10 +253,14 @@
     background: transparent;
   }
   .scroll-slim::-webkit-scrollbar-thumb {
-    background: var(--color-bark-600);
+    background: var(--color-moss-600);
     border-radius: 99px;
   }
   .scroll-slim::-webkit-scrollbar-thumb:hover {
-    background: var(--color-bark-500);
+    background: var(--color-moss-500);
+  }
+
+  .arch-frame {
+    border-radius: 999px 999px 18px 18px / 520px 520px 18px 18px;
   }
 }

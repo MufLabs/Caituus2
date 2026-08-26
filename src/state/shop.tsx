@@ -8,185 +8,147 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import {
-  FLAT_SHIPPING,
-  FREE_SHIPPING_AT,
-  PRODUCTS,
-  grindLabel,
-  type Grind,
-  type Product,
-} from "../data/products";
+import { FREE_SHIPPING_AT, PRODUCTS, SHIPPING_FEE, type Product } from "../data/products";
 
 export interface CartLine {
-  key: string;
   productId: string;
-  grind: Grind;
   qty: number;
 }
 
-export interface Toast {
+export interface ToastData {
   id: number;
   title: string;
   sub?: string;
-  kind: "success" | "info";
+  kind?: "info" | "success";
   ctaLabel?: string;
   onCta?: () => void;
 }
 
-interface ShopValue {
+interface ShopContextValue {
   lines: CartLine[];
   count: number;
   subtotal: number;
   shipping: number;
   total: number;
-  addToCart: (product: Product, grind: Grind, qty: number) => void;
-  setQty: (key: string, qty: number) => void;
-  removeLine: (key: string) => void;
+  cartOpen: boolean;
+  setCartOpen: (v: boolean) => void;
+  addToCart: (product: Product, qty?: number) => void;
+  setQty: (productId: string, qty: number) => void;
+  removeLine: (productId: string) => void;
   clearCart: () => void;
   favorites: string[];
   toggleFavorite: (id: string) => void;
-  toasts: Toast[];
-  pushToast: (t: Omit<Toast, "id">) => void;
+  toasts: ToastData[];
+  pushToast: (t: Omit<ToastData, "id">) => void;
   dismissToast: (id: number) => void;
-  cartOpen: boolean;
-  setCartOpen: (open: boolean) => void;
 }
 
-const ShopContext = createContext<ShopValue | null>(null);
+const ShopContext = createContext<ShopContextValue | null>(null);
 
-const CART_KEY = "emberfield.cart.v1";
-const FAV_KEY = "emberfield.favs.v1";
-
-function load<T>(key: string, fallback: T): T {
+function readLS<T>(key: string, fallback: T): T {
   try {
     const raw = localStorage.getItem(key);
-    if (!raw) return fallback;
-    return JSON.parse(raw) as T;
+    return raw ? (JSON.parse(raw) as T) : fallback;
   } catch {
     return fallback;
   }
 }
 
 export function ShopProvider({ children }: { children: ReactNode }) {
-  const [lines, setLines] = useState<CartLine[]>(() => {
-    const stored = load<CartLine[]>(CART_KEY, []);
-    return stored.filter((l) => PRODUCTS.some((p) => p.id === l.productId));
-  });
-  const [favorites, setFavorites] = useState<string[]>(() => load<string[]>(FAV_KEY, []));
-  const [toasts, setToasts] = useState<Toast[]>([]);
+  const [lines, setLines] = useState<CartLine[]>(() => readLS("caituus.cart.v1", []));
+  const [favorites, setFavorites] = useState<string[]>(() => readLS("caituus.favs.v1", []));
   const [cartOpen, setCartOpen] = useState(false);
-  const toastId = useRef(1);
-  const timers = useRef<Map<number, ReturnType<typeof setTimeout>>>(new Map());
+  const [toasts, setToasts] = useState<ToastData[]>([]);
+  const toastId = useRef(0);
 
   useEffect(() => {
     try {
-      localStorage.setItem(CART_KEY, JSON.stringify(lines));
+      localStorage.setItem("caituus.cart.v1", JSON.stringify(lines));
     } catch {
-      /* storage unavailable */
+      /* almacenamiento no disponible */
     }
   }, [lines]);
 
   useEffect(() => {
     try {
-      localStorage.setItem(FAV_KEY, JSON.stringify(favorites));
+      localStorage.setItem("caituus.favs.v1", JSON.stringify(favorites));
     } catch {
-      /* storage unavailable */
+      /* almacenamiento no disponible */
     }
   }, [favorites]);
 
-  const dismissToast = useCallback((id: number) => {
-    setToasts((t) => t.filter((x) => x.id !== id));
-    const timer = timers.current.get(id);
-    if (timer) {
-      clearTimeout(timer);
-      timers.current.delete(id);
-    }
+  const pushToast = useCallback((t: Omit<ToastData, "id">) => {
+    const id = ++toastId.current;
+    setToasts((prev) => [...prev.slice(-2), { ...t, id }]);
+    window.setTimeout(() => {
+      setToasts((prev) => prev.filter((x) => x.id !== id));
+    }, 3600);
   }, []);
 
-  const pushToast = useCallback(
-    (t: Omit<Toast, "id">) => {
-      const id = toastId.current++;
-      setToasts((prev) => [...prev.slice(-2), { ...t, id }]);
-      const timer = setTimeout(() => dismissToast(id), 3600);
-      timers.current.set(id, timer);
-    },
-    [dismissToast]
-  );
+  const dismissToast = useCallback((id: number) => {
+    setToasts((prev) => prev.filter((x) => x.id !== id));
+  }, []);
 
   const addToCart = useCallback(
-    (product: Product, grind: Grind, qty: number) => {
-      const key = `${product.id}:${grind}`;
+    (product: Product, qty = 1) => {
       setLines((prev) => {
-        const existing = prev.find((l) => l.key === key);
+        const existing = prev.find((l) => l.productId === product.id);
         if (existing) {
-          return prev.map((l) => (l.key === key ? { ...l, qty: Math.min(12, l.qty + qty) } : l));
+          return prev.map((l) =>
+            l.productId === product.id ? { ...l, qty: Math.min(12, l.qty + qty) } : l
+          );
         }
-        return [...prev, { key, productId: product.id, grind, qty }];
+        return [...prev, { productId: product.id, qty }];
       });
       pushToast({
-        title: "Added to your bag",
-        sub: `${product.name} · ${grindLabel(grind)} × ${qty}`,
-        kind: "success",
-        ctaLabel: "View bag",
+        title: `${product.name} agregado`,
+        sub: `${product.mg} mg · ${product.size}`,
+        ctaLabel: "Ver mi bolsa",
         onCta: () => setCartOpen(true),
       });
     },
     [pushToast]
   );
 
-  const setQty = useCallback((key: string, qty: number) => {
+  const setQty = useCallback((productId: string, qty: number) => {
     setLines((prev) =>
-      qty <= 0
-        ? prev.filter((l) => l.key !== key)
-        : prev.map((l) => (l.key === key ? { ...l, qty: Math.min(12, qty) } : l))
+      prev.map((l) => (l.productId === productId ? { ...l, qty: Math.max(1, Math.min(12, qty)) } : l))
     );
   }, []);
 
-  const removeLine = useCallback((key: string) => {
-    setLines((prev) => prev.filter((l) => l.key !== key));
+  const removeLine = useCallback((productId: string) => {
+    setLines((prev) => prev.filter((l) => l.productId !== productId));
   }, []);
 
   const clearCart = useCallback(() => setLines([]), []);
 
-  const toggleFavorite = useCallback(
-    (id: string) => {
-      setFavorites((prev) => {
-        const has = prev.includes(id);
-        const product = PRODUCTS.find((p) => p.id === id);
-        if (product) {
-          pushToast(
-            has
-              ? { title: "Removed from saved", sub: product.name, kind: "info" }
-              : { title: "Saved for later", sub: product.name, kind: "success" }
-          );
-        }
-        return has ? prev.filter((x) => x !== id) : [...prev, id];
-      });
-    },
-    [pushToast]
-  );
+  const toggleFavorite = useCallback((id: string) => {
+    setFavorites((prev) => (prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]));
+  }, []);
 
   const { count, subtotal } = useMemo(() => {
     let c = 0;
     let s = 0;
-    for (const line of lines) {
-      const product = PRODUCTS.find((p) => p.id === line.productId);
-      if (!product) continue;
-      c += line.qty;
-      s += product.price * line.qty;
+    for (const l of lines) {
+      const p = PRODUCTS.find((p) => p.id === l.productId);
+      if (!p) continue;
+      c += l.qty;
+      s += p.price * l.qty;
     }
     return { count: c, subtotal: s };
   }, [lines]);
 
-  const shipping = subtotal === 0 || subtotal >= FREE_SHIPPING_AT ? 0 : FLAT_SHIPPING;
+  const shipping = subtotal === 0 || subtotal >= FREE_SHIPPING_AT ? 0 : SHIPPING_FEE;
   const total = subtotal + shipping;
 
-  const value: ShopValue = {
+  const value: ShopContextValue = {
     lines,
     count,
     subtotal,
     shipping,
     total,
+    cartOpen,
+    setCartOpen,
     addToCart,
     setQty,
     removeLine,
@@ -196,15 +158,13 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     toasts,
     pushToast,
     dismissToast,
-    cartOpen,
-    setCartOpen,
   };
 
   return <ShopContext.Provider value={value}>{children}</ShopContext.Provider>;
 }
 
-export function useShop(): ShopValue {
+export function useShop(): ShopContextValue {
   const ctx = useContext(ShopContext);
-  if (!ctx) throw new Error("useShop must be used inside ShopProvider");
+  if (!ctx) throw new Error("useShop debe usarse dentro de <ShopProvider>");
   return ctx;
 }

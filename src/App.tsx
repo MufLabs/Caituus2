@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
+import AgeGate from "./components/AgeGate";
 import CartDrawer from "./components/CartDrawer";
 import CheckoutModal from "./components/CheckoutModal";
-import CraftBand from "./components/CraftBand";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
+import MethodBand from "./components/MethodBand";
 import OpeningBoard from "./components/OpeningBoard";
 import ProductCard from "./components/ProductCard";
 import ProductModal from "./components/ProductModal";
@@ -13,8 +14,7 @@ import Toolbar, { type SortId } from "./components/Toolbar";
 import { SearchIcon, XIcon } from "./components/icons";
 import {
   PRODUCTS,
-  formatDay,
-  mostRecentMonday,
+  intensityOf,
   type Category,
   type Product,
 } from "./data/products";
@@ -24,7 +24,7 @@ function AppContent() {
   const { cartOpen, setCartOpen } = useShop();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<Category | "all">("all");
-  const [roastFilter, setRoastFilter] = useState<number | null>(null);
+  const [intensity, setIntensity] = useState<number | null>(null);
   const [sort, setSort] = useState<SortId>("featured");
   const [selected, setSelected] = useState<Product | null>(null);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
@@ -33,18 +33,18 @@ function AppContent() {
     const q = query.trim().toLowerCase();
     let list = PRODUCTS.filter((p) => {
       if (category !== "all" && p.category !== category) return false;
-      if (roastFilter !== null && p.roast !== roastFilter) return false;
+      if (intensity !== null && intensityOf(p.mg) !== intensity) return false;
       if (!q) return true;
-      const haystack = [p.name, p.origin, p.region, p.process, p.varietal, p.notes.join(" "), p.category]
+      const haystack = [p.name, p.tagline, p.description, p.category, p.notes.join(" ")]
         .join(" ")
         .toLowerCase();
       return haystack.includes(q);
     });
     if (sort === "price-asc") list = [...list].sort((a, b) => a.price - b.price);
     if (sort === "price-desc") list = [...list].sort((a, b) => b.price - a.price);
-    if (sort === "roast-asc") list = [...list].sort((a, b) => a.roast - b.roast);
+    if (sort === "mg-asc") list = [...list].sort((a, b) => a.mg - b.mg);
     return list;
-  }, [query, category, roastFilter, sort]);
+  }, [query, category, intensity, sort]);
 
   const overlayOpen = cartOpen || checkoutOpen || selected !== null;
   useEffect(() => {
@@ -57,28 +57,29 @@ function AppContent() {
   const clearFilters = () => {
     setQuery("");
     setCategory("all");
-    setRoastFilter(null);
+    setIntensity(null);
   };
 
   return (
     <div className="min-h-screen">
       <div className="grain-overlay" aria-hidden="true" />
+      <AgeGate />
       <Header />
 
       <main>
         <OpeningBoard />
 
-        <section id="shop" className="mx-auto max-w-7xl scroll-mt-24 px-4 pt-14 sm:px-6 lg:px-8 lg:pt-16">
+        <section id="tienda" className="mx-auto max-w-7xl scroll-mt-24 px-4 pt-14 sm:px-6 lg:px-8 lg:pt-16">
           <Reveal>
             <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
               <div>
-                <p className="font-mono text-[11px] tracking-[0.28em] text-ember-400 uppercase">The shelf</p>
-                <h2 className="mt-2 font-display text-4xl font-semibold tracking-tight text-sand-100 sm:text-5xl">
-                  This week&apos;s roast board
+                <p className="font-mono text-[11px] tracking-[0.28em] text-leaf-400 uppercase">La vitrina</p>
+                <h2 className="mt-2 font-display text-4xl tracking-tight text-cream-100 sm:text-5xl">
+                  Seis fórmulas, <em className="text-amber-400">tres líneas.</em>
                 </h2>
               </div>
-              <p className="hidden font-mono text-[11px] tracking-[0.16em] text-latte-500 uppercase md:block">
-                All bags 250 g · dropped Mon {formatDay(mostRecentMonday())}
+              <p className="hidden max-w-xs font-mono text-[11px] leading-relaxed tracking-[0.1em] text-moss-500 uppercase md:block">
+                Todos los lotes con certificado de análisis · Espectro completo y amplio
               </p>
             </div>
           </Reveal>
@@ -88,8 +89,8 @@ function AppContent() {
             onQuery={setQuery}
             category={category}
             onCategory={setCategory}
-            roastFilter={roastFilter}
-            onRoastFilter={setRoastFilter}
+            intensity={intensity}
+            onIntensity={setIntensity}
             sort={sort}
             onSort={setSort}
             resultCount={filtered.length}
@@ -104,29 +105,29 @@ function AppContent() {
               ))}
             </div>
           ) : (
-            <div className="my-14 flex animate-rise flex-col items-center rounded-lg border border-dashed border-bark-600 px-6 py-20 text-center">
-              <span className="grid h-16 w-16 place-items-center rounded-full border border-bark-600 bg-bark-800 text-latte-500">
+            <div className="my-14 flex animate-rise flex-col items-center rounded-lg border border-dashed border-moss-600 px-6 py-20 text-center">
+              <span className="grid h-16 w-16 place-items-center rounded-full border border-moss-600 bg-moss-800 text-moss-500">
                 <SearchIcon className="h-7 w-7" />
               </span>
-              <h3 className="mt-5 font-display text-2xl font-semibold text-sand-100">
-                Nothing on the shelf matches
+              <h3 className="mt-5 font-display text-2xl text-cream-100">
+                Nada en la vitrina coincide
               </h3>
-              <p className="mt-2 max-w-sm text-sm text-latte-400">
+              <p className="mt-2 max-w-sm text-sm text-cream-300/70">
                 {query
-                  ? `We couldn't find anything for "${query}" with those filters. Try a tasting note like "chocolate" or clear the filters.`
-                  : "No coffees match that combination. Loosen a filter or two."}
+                  ? `No encontramos nada para "${query}" con esos filtros. Prueba con "calma", "piel" o "mascotas".`
+                  : "Ninguna fórmula coincide con esa combinación. Afloja un filtro o dos."}
               </p>
               <button
                 onClick={clearFilters}
-                className="btn-press mt-6 flex items-center gap-2 rounded-full border border-bark-600 px-5 py-2.5 text-sm font-semibold text-sand-200 hover:border-ember-500 hover:text-ember-300"
+                className="btn-press mt-6 flex items-center gap-2 rounded-full border border-moss-600 px-5 py-2.5 text-sm font-semibold text-cream-200 hover:border-leaf-500 hover:text-leaf-300"
               >
-                <XIcon className="h-4 w-4" /> Clear search & filters
+                <XIcon className="h-4 w-4" /> Limpiar búsqueda y filtros
               </button>
             </div>
           )}
         </section>
 
-        <CraftBand />
+        <MethodBand />
       </main>
 
       <Footer onOpenProduct={setSelected} onCategory={setCategory} />

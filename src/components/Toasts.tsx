@@ -1,5 +1,5 @@
 import { useShop } from "../state/shop";
-import { BeanIcon, CheckIcon, XIcon } from "./icons";
+import { CheckIcon, LeafIcon, XIcon } from "./icons";
 
 export default function Toasts() {
   const { toasts, dismissToast } = useShop();
@@ -20,7 +20,7 @@ export default function Toasts() {
                 t.kind === "success" ? "bg-sage-500/20 text-sage-300" : "bg-bark-700 text-latte-300"
               }`}
             >
-              {t.kind === "success" ? <CheckIcon className="h-3.5 w-3.5" /> : <BeanIcon className="h-4 w-4" />}
+              {t.kind === "success" ? <CheckIcon className="h-3.5 w-3.5" /> : <LeafIcon className="h-4 w-4" />}
             </span>
             <div className="min-w-0">
               <p className="text-sm font-bold text-sand-100">{t.title}</p>

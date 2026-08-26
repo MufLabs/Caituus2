@@ -1,89 +1,100 @@
+import { useEffect, useState } from "react";
 import { useShop } from "../state/shop";
-import { BagIcon, BeanIcon, CupIcon } from "./icons";
+import { BagIcon, CaituusMark, WhatsAppIcon } from "./icons";
 
-const TICKER_ITEMS = [
-  "Roasted every Monday",
-  "Free shipping over $45",
-  "Direct trade · 12 partner farms",
-  "Shipped within 48 hours of roast",
-  "Compostable bags, carbon-neutral post",
-  "4.8 ★ from 1,485 bag reviews",
+const TICKER = [
+  "Envío gratis desde " + "$200.000",
+  "Paga con Nequi · Daviplata · PSE · Contraentrega",
+  "Hemp orgánico · THC < 0.3%",
+  "Verificados en laboratorio por lote",
+  "Bogotá, Colombia · Envíos a todo el país",
+  "Ley 1787 de 2016 · Decreto 613 de 2017",
 ];
 
-function Ticker() {
-  const items = [...TICKER_ITEMS, ...TICKER_ITEMS];
-  return (
-    <div className="marquee overflow-hidden border-b border-bark-700/70 bg-bark-850">
-      <div className="marquee-track flex w-max items-center animate-marquee py-2">
-        {items.map((item, i) => (
-          <span
-            key={i}
-            className="flex items-center gap-3 pr-3 font-mono text-[11px] tracking-[0.18em] text-latte-400 uppercase whitespace-nowrap"
-          >
-            <span className="text-ember-500">{item}</span>
-            <BeanIcon className="h-3 w-3 text-bark-500" />
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export default function Header() {
-  const { count, setCartOpen } = useShop();
+  const { count, cartOpen, setCartOpen } = useShop();
+  const [scrolled, setScrolled] = useState(false);
+  const [bump, setBump] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    if (count === 0) return;
+    setBump(true);
+    const t = window.setTimeout(() => setBump(false), 450);
+    return () => window.clearTimeout(t);
+  }, [count]);
 
   return (
-    <>
-      <Ticker />
-      <header className="sticky top-0 z-40 border-b border-bark-700/70 bg-bark-900/92 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6 lg:px-8">
-          <a href="#top" className="group flex items-center gap-3">
-            <span className="grid h-10 w-10 place-items-center rounded-full border border-ember-600/50 bg-bark-800 text-ember-400 transition-colors group-hover:border-ember-400 group-hover:text-ember-300">
-              <CupIcon className="h-5 w-5" />
-            </span>
-            <span className="leading-tight">
-              <span className="block font-display text-xl font-semibold tracking-tight text-sand-100">
-                Emberfield
-              </span>
-              <span className="block font-mono text-[9px] tracking-[0.34em] text-latte-500 uppercase">
-                Roasters · Est. 2017
+    <header className="sticky top-0 z-40">
+      <div className="marquee overflow-hidden border-b border-moss-700/70 bg-moss-950">
+        <div className="marquee-track flex w-max animate-marquee items-center">
+          {[0, 1].map((half) => (
+            <div key={half} className="flex items-center" aria-hidden={half === 1}>
+              {TICKER.map((item, i) => (
+                <span
+                  key={i}
+                  className="flex items-center gap-3 pr-3 font-mono text-[10px] tracking-[0.22em] whitespace-nowrap text-cream-300/85 uppercase"
+                >
+                  <span className="py-2">{item}</span>
+                  <svg viewBox="0 0 24 24" className="h-2.5 w-2.5 text-leaf-500" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                    <path d="M12 4c.5 3.4 2.1 5.1 5.5 5.6-3.4.5-5 2.2-5.5 5.6-.5-3.4-2.1-5.1-5.5-5.6 3.4-.5 5-2.2 5.5-5.6Z" />
+                  </svg>
+                </span>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div
+        className={`border-b border-moss-700/70 transition-all duration-300 ${
+          scrolled ? "bg-moss-900/95 shadow-[0_12px_36px_-18px_rgba(11,19,12,0.9)] backdrop-blur-md" : "bg-moss-900/80 backdrop-blur-sm"
+        }`}
+      >
+        <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+          <a href="#inicio" className="group flex items-center gap-3">
+            <CaituusMark className="h-9 w-9 text-leaf-400 transition-transform duration-300 group-hover:rotate-6" />
+            <span className="leading-none">
+              <span className="block font-display text-[26px] tracking-wide text-cream-100">Caituus</span>
+              <span className="mt-0.5 block font-mono text-[8px] tracking-[0.3em] text-leaf-500 uppercase">
+                Cannabis esencial
               </span>
             </span>
           </a>
 
-          <nav className="hidden items-center gap-8 md:flex">
-            {[
-              { label: "Roast board", href: "#shop" },
-              { label: "Craft", href: "#craft" },
-              { label: "Visit", href: "#visit" },
-            ].map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="group relative font-mono text-xs tracking-[0.2em] text-latte-400 uppercase transition-colors hover:text-ember-300"
-              >
-                {link.label}
-                <span className="absolute -bottom-1.5 left-0 h-px w-0 bg-ember-400 transition-all duration-300 group-hover:w-full" />
-              </a>
-            ))}
+          <nav className="hidden items-center gap-8 text-sm font-semibold text-cream-300 md:flex" aria-label="Navegación principal">
+            <a href="#tienda" className="transition-colors hover:text-leaf-300">Tienda</a>
+            <a href="#metodo" className="transition-colors hover:text-leaf-300">El método</a>
+            <a href="#como-comprar" className="transition-colors hover:text-leaf-300">Cómo comprar</a>
+            <a href="#contacto" className="transition-colors hover:text-leaf-300">Contacto</a>
           </nav>
 
-          <div className="flex items-center gap-3">
-            <span className="hidden items-center gap-2 rounded-full border border-bark-600 px-3 py-1.5 font-mono text-[10px] tracking-[0.18em] text-sage-400 uppercase lg:flex">
-              <span className="h-1.5 w-1.5 animate-pulse-dot rounded-full bg-sage-400" />
-              Drum fires Mon 06:00
-            </span>
-            <button
-              onClick={() => setCartOpen(true)}
-              className="btn-press relative flex items-center gap-2 rounded-full border border-bark-600 bg-bark-800 px-4 py-2.5 text-sm font-semibold text-sand-100 hover:border-ember-500/70 hover:bg-bark-700"
-              aria-label={`Open bag, ${count} items`}
+          <div className="flex items-center gap-2.5">
+            <a
+              href="https://wa.me/573001234567"
+              target="_blank"
+              rel="noreferrer"
+              className="btn-press hidden items-center gap-2 rounded-full border border-moss-600 px-4 py-2 text-xs font-bold text-leaf-300 hover:border-leaf-500 hover:bg-moss-800 sm:flex"
             >
-              <BagIcon className="h-4.5 w-4.5 text-ember-400" />
-              <span className="hidden sm:inline">Bag</span>
+              <WhatsAppIcon className="h-4 w-4" /> WhatsApp
+            </a>
+            <button
+              onClick={() => setCartOpen(!cartOpen)}
+              className="btn-press relative grid h-11 w-11 place-items-center rounded-full border border-moss-600 text-cream-100 hover:border-leaf-500 hover:bg-moss-800"
+              aria-label={`Abrir bolsa de compras, ${count} productos`}
+            >
+              <BagIcon className="h-5 w-5" />
               {count > 0 && (
                 <span
-                  key={count}
-                  className="absolute -top-1.5 -right-1.5 grid h-5 min-w-5 animate-pop place-items-center rounded-full bg-ember-500 px-1 font-mono text-[10px] font-bold text-bark-950"
+                  className={`absolute -top-1 -right-1 grid h-5 min-w-5 place-items-center rounded-full bg-amber-500 px-1 font-mono text-[10px] font-bold text-moss-950 ${
+                    bump ? "animate-pop" : ""
+                  }`}
                 >
                   {count}
                 </span>
@@ -91,7 +102,7 @@ export default function Header() {
             </button>
           </div>
         </div>
-      </header>
-    </>
+      </div>
+    </header>
   );
 }

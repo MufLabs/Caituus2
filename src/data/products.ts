@@ -1,224 +1,319 @@
-export type Category = "single-origin" | "blend" | "espresso" | "decaf";
-export type Grind = "whole" | "filter" | "espresso";
+export type Category = "piel" | "salud" | "mascotas";
 
 export interface Product {
   id: string;
   name: string;
-  origin: string;
-  region: string;
   category: Category;
-  process: string;
-  varietal: string;
-  roast: 1 | 2 | 3 | 4 | 5;
-  altitude: string;
-  producer: string;
-  notes: string[];
+  tagline: string;
+  description: string;
+  image: string;
   price: number;
-  weight: number;
-  stock: number;
+  compareAt?: number;
+  mg: number;
+  size: string;
+  notes: string[];
   rating: number;
   reviews: number;
-  badge?: { label: string; tone: "sage" | "ember" | "berry" | "copper" };
-  description: string;
-  brew: { method: string; ratio: string; temp: string; time: string };
+  stock: number;
   accent: string;
-  image: string;
+  badge?: { label: string; tone: "leaf" | "amber" | "sky" | "clay" };
+  usage: { method: string; dose: string; when: string };
+  specs: [string, string][];
 }
 
-export const CATEGORIES: { id: Category | "all"; label: string }[] = [
-  { id: "all", label: "All coffees" },
-  { id: "single-origin", label: "Single origin" },
-  { id: "espresso", label: "Espresso" },
-  { id: "blend", label: "Blends" },
-  { id: "decaf", label: "Decaf" },
+export const CATEGORIES: { id: Category; label: string; blurb: string }[] = [
+  { id: "piel", label: "Piel", blurb: "Tópicos y cosmética con CBD" },
+  { id: "salud", label: "Salud", blurb: "Aceites y bienestar diario" },
+  { id: "mascotas", label: "Mascotas", blurb: "Calma para perros y gatos" },
 ];
 
-export const GRINDS: { id: Grind; label: string; hint: string }[] = [
-  { id: "whole", label: "Whole bean", hint: "Grind at home" },
-  { id: "filter", label: "Filter", hint: "V60 · batch brew" },
-  { id: "espresso", label: "Espresso", hint: "Fine grind" },
-];
+export const INTENSITY_LEVELS = [
+  { id: 1, label: "Suave", range: "≤ 300 mg" },
+  { id: 2, label: "Media", range: "500 – 750 mg" },
+  { id: 3, label: "Intensa", range: "≥ 1000 mg" },
+] as const;
 
-export const grindLabel = (g: Grind) => GRINDS.find((x) => x.id === g)?.label ?? g;
-
-export const ROAST_LABELS: Record<number, string> = {
-  1: "Extra light",
-  2: "Light",
-  3: "Medium",
-  4: "Medium-dark",
-  5: "Dark",
-};
-
-export const FREE_SHIPPING_AT = 45;
-export const FLAT_SHIPPING = 6;
-
-export const money = (n: number) => `$${n.toFixed(2)}`;
-
-export function mostRecentMonday(): Date {
-  const d = new Date();
-  const offset = (d.getDay() + 6) % 7;
-  d.setDate(d.getDate() - offset);
-  d.setHours(9, 0, 0, 0);
-  return d;
-}
-
-export function formatDay(d: Date): string {
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+export function intensityOf(mg: number): number {
+  if (mg <= 300) return 1;
+  if (mg <= 750) return 2;
+  return 3;
 }
 
 export const PRODUCTS: Product[] = [
   {
-    id: "guji",
-    name: "Guji Highlands",
-    origin: "Ethiopia",
-    region: "Oromia · Hambela",
-    category: "single-origin",
-    process: "Washed",
-    varietal: "Heirloom 74158",
-    roast: 2,
-    altitude: "2,100–2,300 masl",
-    producer: "Buku Abel station · ~450 smallholders",
-    notes: ["Bergamot", "Blueberry", "Jasmine"],
-    price: 21,
-    weight: 250,
-    stock: 18,
-    rating: 4.9,
-    reviews: 212,
-    badge: { label: "New harvest", tone: "sage" },
+    id: "aceite-full-10",
+    name: "Aceite Full Spectrum 10%",
+    category: "salud",
+    tagline: "El esencial de todos los días",
     description:
-      "Heirloom trees growing wild above 2,100 metres, picked deep-red and washed clean at the Buku Abel station. A luminous, tea-like cup — bergamot up front, blueberry as it cools, and a jasmine finish that lingers long after the last sip.",
-    brew: { method: "V60 pour-over", ratio: "1 : 16", temp: "94°C", time: "2:45" },
-    accent: "#E5B36B",
+      "Extracto de espectro completo en aceite MCT de coco orgánico. Diseñado para tu rutina diaria: calma, descanso y equilibrio del sistema endocannabinoide con cada dosis sublingual.",
     image:
-      "https://image.qwenlm.ai/generated-images/5c31bc6c-eed5-4622-99d4-d3694a6e95cd/_result.png",
-  },
-  {
-    id: "huila",
-    name: "La Palma, Huila",
-    origin: "Colombia",
-    region: "Huila · Garzón",
-    category: "single-origin",
-    process: "Honey",
-    varietal: "Pink Bourbon",
-    roast: 3,
-    altitude: "1,750 masl",
-    producer: "Finca La Palma · Rojas family",
-    notes: ["Panela", "Red apple", "Almond"],
-    price: 19,
-    weight: 250,
+      "https://image.qwenlm.ai/generated-images/a0999335-f01a-43a0-b573-8e2afa4541e1/_result.png",
+    price: 145000,
+    mg: 1000,
+    size: "30 ml",
+    notes: ["Calma", "Descanso", "Rutina diaria"],
+    rating: 4.9,
+    reviews: 214,
     stock: 24,
+    accent: "#DBA545",
+    badge: { label: "Más vendido", tone: "amber" },
+    usage: { method: "Sublingual", dose: "0.5 ml ≈ 16 mg de CBD", when: "1 – 2 veces al día" },
+    specs: [
+      ["Extracción", "CO₂ supercrítico"],
+      ["Origen del hemp", "Cultivo orgánico certificado"],
+      ["THC", "< 0.3% (cumple normativa)"],
+      ["Análisis", "Certificado por lote (QR en el empaque)"],
+    ],
+  },
+  {
+    id: "aceite-full-25",
+    name: "Aceite Full Spectrum 25%",
+    category: "salud",
+    tagline: "Concentración intensa",
+    description:
+      "La misma fórmula de espectro completo, con dos veces y media la concentración. Para quienes ya conocen el CBD y buscan soporte intensivo para molestias crónicas y recuperación.",
+    image:
+      "https://image.qwenlm.ai/generated-images/a0999335-f01a-43a0-b573-8e2afa4541e1/_result.png",
+    price: 289000,
+    compareAt: 322000,
+    mg: 2500,
+    size: "30 ml",
+    notes: ["Molestias crónicas", "Recuperación", "Concentración"],
     rating: 4.8,
-    reviews: 164,
-    description:
-      "The Rojas family's honey-processed lot from a single ridge outside Garzón. Leaving the mucilage on through drying rounds the cup into something soft and sweet — panela up front, crisp red apple in the middle, a long almond-butter finish.",
-    brew: { method: "V60 pour-over", ratio: "1 : 16", temp: "93°C", time: "2:50" },
-    accent: "#8FA174",
-    image:
-      "https://image.qwenlm.ai/generated-images/8a00ccde-987a-400e-b758-cb9e7063438a/_result.png",
+    reviews: 167,
+    stock: 12,
+    accent: "#7FA365",
+    badge: { label: "Intenso", tone: "leaf" },
+    usage: { method: "Sublingual", dose: "0.5 ml ≈ 41 mg de CBD", when: "1 – 2 veces al día" },
+    specs: [
+      ["Extracción", "CO₂ supercrítico"],
+      ["Origen del hemp", "Cultivo orgánico certificado"],
+      ["THC", "< 0.3% (cumple normativa)"],
+      ["Análisis", "Certificado por lote (QR en el empaque)"],
+    ],
   },
   {
-    id: "nyeri",
-    name: "Nyeri AA",
-    origin: "Kenya",
-    region: "Nyeri County",
-    category: "single-origin",
-    process: "Washed · double fermented",
-    varietal: "SL28 · SL34",
-    roast: 2,
-    altitude: "1,800 masl",
-    producer: "Gichathaini factory · 700 members",
-    notes: ["Blackcurrant", "Grapefruit", "Demerara"],
-    price: 22,
-    weight: 250,
-    stock: 7,
-    rating: 4.9,
-    reviews: 98,
-    badge: { label: "Small lot", tone: "berry" },
+    id: "crema-recovery",
+    name: "Crema Tópica Recovery",
+    category: "piel",
+    tagline: "Alivio localizado, cuerpo en movimiento",
     description:
-      "An AA outturn from the Gichathaini factory — small, dense SL28 and SL34 cherries given a meticulous double fermentation. Bright and structured: blackcurrant juice, pink grapefruit, and a deep demerara sweetness in the finish.",
-    brew: { method: "Origami / Kalita", ratio: "1 : 16", temp: "93°C", time: "2:40" },
-    accent: "#95566C",
+      "CBD de amplio espectro combinado con árnica, mentol y alcanfor natural. Se absorbe rápido y acompaña músculos y articulaciones después del entrenamiento o de jornadas largas.",
     image:
-      "https://image.qwenlm.ai/generated-images/016eec97-26cc-429d-9d42-0b76c96e078d/_result.png",
-  },
-  {
-    id: "night-shift",
-    name: "Night Shift",
-    origin: "Brazil + Colombia",
-    region: "Cerrado · Huila",
-    category: "espresso",
-    process: "Natural + washed",
-    varietal: "Mundo Novo · Caturra",
-    roast: 4,
-    altitude: "1,100–1,600 masl",
-    producer: "Blend of two partner farms",
-    notes: ["Dark chocolate", "Hazelnut", "Molasses"],
-    price: 18,
-    weight: 250,
-    stock: 42,
+      "https://image.qwenlm.ai/generated-images/bf0ee331-d96d-4920-b25b-5b1eb597e336/_result.png",
+    price: 118000,
+    mg: 500,
+    size: "60 ml",
+    notes: ["Árnica", "Mentol", "Post-entrenamiento"],
     rating: 4.7,
-    reviews: 431,
-    badge: { label: "Best seller", tone: "ember" },
-    description:
-      "Our espresso workhorse. A natural Brazil base wrapped in washed Colombia — syrupy body, dark chocolate and roasted hazelnut, and a molasses finish that cuts straight through milk. Forgiving on the grinder, relentless in the cup.",
-    brew: { method: "Espresso", ratio: "1 : 2", temp: "93°C", time: "0:27" },
-    accent: "#CD7F49",
-    image:
-      "https://image.qwenlm.ai/generated-images/fbfb8353-db78-4889-98b4-cc5944c3ab85/_result.png",
+    reviews: 98,
+    stock: 30,
+    accent: "#9DBE83",
+    usage: { method: "Tópico", dose: "Aplicar sobre la zona y masajear", when: "2 – 3 veces al día" },
+    specs: [
+      ["Fórmula", "Amplio espectro · 0% THC"],
+      ["Activos", "Árnica, mentol y alcanfor"],
+      ["Textura", "Crema de rápida absorción"],
+      ["Apto para", "Todo tipo de piel, uso externo"],
+    ],
   },
   {
-    id: "hearthside",
-    name: "Hearthside",
-    origin: "Guatemala + Ethiopia",
-    region: "Antigua · Guji",
-    category: "blend",
-    process: "Washed",
-    varietal: "Bourbon · Heirloom",
-    roast: 3,
-    altitude: "1,600–2,100 masl",
-    producer: "House blend · two origins",
-    notes: ["Caramel", "Orange zest", "Cocoa nib"],
-    price: 17,
-    weight: 250,
-    stock: 36,
+    id: "serum-glow",
+    name: "Sérum Facial Glow",
+    category: "piel",
+    tagline: "Calma visible para piel sensible",
+    description:
+      "Sérum ligero de CBD con rosa mosqueta, vitamina E y escualano vegetal. Hidrata, ayuda a reducir rojeces y devuelve luminosidad sin obstruir los poros.",
+    image:
+      "https://image.qwenlm.ai/generated-images/9c1357b7-116f-45b9-9bf3-c5a471fa7915/_result.png",
+    price: 132000,
+    mg: 300,
+    size: "30 ml",
+    notes: ["Rosa mosqueta", "Vitamina E", "Piel sensible"],
     rating: 4.8,
-    reviews: 377,
-    badge: { label: "Staff pick", tone: "copper" },
-    description:
-      "The house filter blend — a washed Guatemalan core with a floral Ethiopian top note. Comfortable every single day: caramel sweetness, a flick of orange zest, cocoa nib in the finish. Brews sweet on virtually any method.",
-    brew: { method: "Batch brew", ratio: "1 : 17", temp: "92°C", time: "4:30" },
-    accent: "#F1E3C8",
-    image:
-      "https://image.qwenlm.ai/generated-images/ff400b38-dbf0-4b6b-a874-60304e45f0e0/_result.png",
+    reviews: 76,
+    stock: 18,
+    accent: "#E8B960",
+    badge: { label: "Nuevo", tone: "sky" },
+    usage: { method: "Facial", dose: "3 – 4 gotas en rostro limpio", when: "En la noche, antes de la crema" },
+    specs: [
+      ["Fórmula", "Amplio espectro · 0% THC"],
+      ["Activos", "Rosa mosqueta, vitamina E, escualano"],
+      ["Comedogénico", "No comedogénico"],
+      ["Apto para", "Piel sensible y mixta"],
+    ],
   },
   {
-    id: "moonlit",
-    name: "Moonlit",
-    origin: "Colombia",
-    region: "Huila · Pitalito",
-    category: "decaf",
-    process: "Sugarcane E.A. decaf",
-    varietal: "Caturra · Castillo",
-    roast: 3,
-    altitude: "1,650 masl",
-    producer: "Smallholder collective, Pitalito",
-    notes: ["Milk chocolate", "Toffee", "Raisin"],
-    price: 18,
-    weight: 250,
-    stock: 5,
-    rating: 4.6,
-    reviews: 203,
+    id: "pet-calm",
+    name: "Pet Calm Gotas",
+    category: "mascotas",
+    tagline: "Calma orgánica para perros y gatos",
     description:
-      "A sugarcane E.A. decaf from Huila, roasted to the same standard as everything else on the board. All of the comfort, none of the jolt — milk chocolate, soft toffee, raisin. A decaf you will not have to apologize for.",
-    brew: { method: "French press", ratio: "1 : 14", temp: "96°C", time: "4:00" },
-    accent: "#7C8AA0",
+      "Gotas de CBD formuladas para mascotas, con sabor salmón que aceptan sin pelear. Pensadas para ansiedad por separación, ruidos fuertes y viajes en carro.",
     image:
-      "https://image.qwenlm.ai/generated-images/baeb25c4-3140-4bc6-a234-fb5b7065c1e4/_result.png",
+      "https://image.qwenlm.ai/generated-images/611023f9-5860-44e9-936a-6b345895b769/_result.png",
+    price: 98000,
+    mg: 250,
+    size: "30 ml",
+    notes: ["Ansiedad", "Ruidos fuertes", "Sabor salmón"],
+    rating: 4.9,
+    reviews: 143,
+    stock: 40,
+    accent: "#DBA545",
+    badge: { label: "Para peludos", tone: "clay" },
+    usage: { method: "Oral (mascotas)", dose: "1 gota por cada 5 kg de peso", when: "30 min antes del evento estresante" },
+    specs: [
+      ["Especies", "Perros y gatos"],
+      ["Sabor", "Salmón natural"],
+      ["THC", "0% — fórmula pet-safe"],
+      ["Registro", "Uso veterinario, guíate por la tabla de peso"],
+    ],
+  },
+  {
+    id: "pet-calm-forte",
+    name: "Pet Calm Forte",
+    category: "mascotas",
+    tagline: "Soporte intensivo para razas grandes",
+    description:
+      "La fórmula Pet Calm triplicada en concentración para razas grandes, mascotas senior o casos de ansiedad severa. Apoya también articulaciones en perros mayores.",
+    image:
+      "https://image.qwenlm.ai/generated-images/611023f9-5860-44e9-936a-6b345895b769/_result.png",
+    price: 172000,
+    mg: 750,
+    size: "30 ml",
+    notes: ["Razas grandes", "Senior", "Articulaciones"],
+    rating: 4.8,
+    reviews: 89,
+    stock: 6,
+    accent: "#BC8734",
+    badge: { label: "Razas grandes", tone: "amber" },
+    usage: { method: "Oral (mascotas)", dose: "1 gota por cada 10 kg de peso", when: "1 – 2 veces al día" },
+    specs: [
+      ["Especies", "Perros (+15 kg) y gatos bajo guía"],
+      ["Sabor", "Salmón natural"],
+      ["THC", "0% — fórmula pet-safe"],
+      ["Registro", "Uso veterinario, guíate por la tabla de peso"],
+    ],
   },
 ];
 
-export const ROAST_LOG = [
-  { batch: "№ 216", coffee: "Guji Highlands", charge: "176°C", drop: "204°C · 11:42", dev: "21.4% dev" },
-  { batch: "№ 215", coffee: "Nyeri AA", charge: "172°C", drop: "199°C · 10:58", dev: "18.9% dev" },
-  { batch: "№ 214", coffee: "Night Shift", charge: "181°C", drop: "214°C · 12:31", dev: "24.2% dev" },
+export const BRAND_ASSET_URL =
+  "https://assets.zyrosite.com/OexDtvuEhf2ueeIp/design-1-AUzK6VSiurSsozgL.png";
+
+/* ---------- Pagos (configurados según el mercado colombiano de la marca) ---------- */
+
+export type PaymentKind = "phone" | "bank" | "card" | "none";
+
+export interface PaymentMethod {
+  id: string;
+  label: string;
+  tag: string;
+  kind: PaymentKind;
+  hint: string;
+}
+
+export const PAYMENT_METHODS: PaymentMethod[] = [
+  {
+    id: "nequi",
+    label: "Nequi",
+    tag: "Aprueba desde tu app",
+    kind: "phone",
+    hint: "Te enviaremos una notificación push a tu Nequi para aprobar el pago.",
+  },
+  {
+    id: "daviplata",
+    label: "Daviplata",
+    tag: "Pago al instante",
+    kind: "phone",
+    hint: "Recibirás la solicitud de pago en tu Daviplata para confirmar.",
+  },
+  {
+    id: "pse",
+    label: "PSE · Transferencia",
+    tag: "Todos los bancos",
+    kind: "bank",
+    hint: "Selecciona tu banco y autoriza el débito desde tu banca virtual.",
+  },
+  {
+    id: "card",
+    label: "Tarjeta crédito / débito",
+    tag: "Visa · Mastercard · Amex",
+    kind: "card",
+    hint: "Procesamiento seguro. No almacenamos los datos de tu tarjeta.",
+  },
+  {
+    id: "cod",
+    label: "Pago contraentrega",
+    tag: "Bogotá y alrededores",
+    kind: "none",
+    hint: "Paga en efectivo o con Nequi cuando recibas tu pedido en la puerta.",
+  },
 ];
+
+export const PSE_BANKS = [
+  "Bancolombia",
+  "Davivienda",
+  "Banco de Bogotá",
+  "BBVA Colombia",
+  "Banco de Occidente",
+  "Banco Popular",
+];
+
+/* ---------- Envíos y normativa ---------- */
+
+export const FREE_SHIPPING_AT = 200000;
+export const SHIPPING_FEE = 12000;
+
+export const LEGAL = {
+  laws: "Ley 1787 de 2016 · Decreto 613 de 2017 · Resolución 539 de 2022",
+  disclaimer:
+    "Los productos Caituus se comercializan bajo el marco regulatorio colombiano para derivados del cannabis. No son medicamentos y ningún contenido de este sitio reemplaza la consulta con un profesional de la salud.",
+  thc: "THC < 0.3% en todos los productos para humanos · 0% en línea mascotas",
+};
+
+export const SOCIALS = [
+  { id: "instagram", label: "@caituus", url: "https://instagram.com/caituus" },
+  { id: "x", label: "@caituus", url: "https://x.com/caituus" },
+  { id: "facebook", label: "CaituusIndica", url: "https://facebook.com/CaituusIndica" },
+];
+
+export const TESTIMONIALS = [
+  {
+    quote:
+      "Mi bulldog le tenía pánico a la pólvora. Con Pet Calm, diciembre por fin fue otra historia para los dos.",
+    name: "Andrés P.",
+    city: "Bogotá",
+    product: "Pet Calm Gotas",
+  },
+  {
+    quote:
+      "Llevaba años buscando algo para las rodillas después de entrenar. La Recovery ya vive en mi maleta del gimnasio.",
+    name: "Camila R.",
+    city: "Medellín",
+    product: "Crema Tópica Recovery",
+  },
+  {
+    quote:
+      "El aceite 10% me ayudó a volver a dormir de corrido. Lo pido cada mes por Nequi y llega en dos días.",
+    name: "Laura M.",
+    city: "Cali",
+    product: "Aceite Full Spectrum 10%",
+  },
+];
+
+/* ---------- Utilidades ---------- */
+
+export function money(value: number): string {
+  return new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+export const CATEGORY_LABELS: Record<Category, string> = {
+  piel: "Piel",
+  salud: "Salud",
+  mascotas: "Mascotas",
+};
