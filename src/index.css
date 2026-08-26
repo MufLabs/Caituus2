@@ -1,40 +1,42 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: "Instrument Serif", "Georgia", serif;
-  --font-body: "Karla", "Trebuchet MS", sans-serif;
+  --font-display: "Lora", "Georgia", serif;
+  --font-body: "Raleway", "Trebuchet MS", sans-serif;
   --font-mono: "Space Mono", "Courier New", monospace;
 
-  --color-moss-950: #0b130c;
-  --color-moss-900: #101a11;
-  --color-moss-850: #142116;
-  --color-moss-800: #1a2b1d;
-  --color-moss-700: #233626;
-  --color-moss-600: #33503a;
-  --color-moss-500: #47694f;
+  /* Papel botánico — semántica invertida respecto al tema oscuro:
+     moss-* = superficies claras, cream-* = tintas oscuras */
+  --color-moss-950: #232920;
+  --color-moss-900: #f1eee3;
+  --color-moss-850: #f8f6ec;
+  --color-moss-800: #ebe7d7;
+  --color-moss-700: #d9d3be;
+  --color-moss-600: #c0b99e;
+  --color-moss-500: #8d8670;
 
-  --color-cream-100: #f5f1e4;
-  --color-cream-200: #ece7d5;
-  --color-cream-300: #ded7bf;
+  --color-cream-100: #2b322a;
+  --color-cream-200: #4b5344;
+  --color-cream-300: #6e7563;
 
-  --color-leaf-300: #b9d3a4;
-  --color-leaf-400: #9dbe83;
-  --color-leaf-500: #7fa365;
-  --color-leaf-600: #63854c;
-  --color-leaf-700: #4d6a3b;
+  --color-leaf-300: #3d6b45;
+  --color-leaf-400: #4c7f53;
+  --color-leaf-500: #5d9463;
+  --color-leaf-600: #37563c;
+  --color-leaf-700: #2c4630;
 
-  --color-amber-300: #f2ce85;
-  --color-amber-400: #e8b960;
-  --color-amber-500: #dba545;
-  --color-amber-600: #bc8734;
-  --color-amber-700: #97692a;
+  --color-amber-300: #a5691f;
+  --color-amber-400: #b87a26;
+  --color-amber-500: #cf9032;
+  --color-amber-600: #a9701f;
+  --color-amber-700: #8a5a19;
 
-  --color-clay-300: #eba489;
-  --color-clay-400: #dd8260;
-  --color-clay-500: #c66245;
+  --color-clay-300: #a94f35;
+  --color-clay-400: #c05f41;
+  --color-clay-500: #b34f33;
 
-  --color-sky-400: #8fb3c7;
-  --color-sky-500: #6f98af;
+  --color-sky-400: #3f7189;
+  --color-sky-500: #35617a;
 
   --animate-marquee: marquee 34s linear infinite;
   --animate-slowspin: slowspin 28s linear infinite;
@@ -46,25 +48,31 @@
   --animate-toastbar: toastbar 3.6s linear both;
   --animate-pulse-dot: pulsedot 1.6s ease-in-out infinite;
   --animate-sway: sway 7s ease-in-out infinite;
-  --animate-panel-in: panelin 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
-  --animate-drawer-in: drawerin 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-panel-in: panel-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-drawer-in: drawer-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
 
-  @keyframes panelin {
+  @keyframes panel-in {
     from {
       opacity: 0;
-      transform: translateY(28px) scale(0.98);
+      transform: translateY(24px) scale(0.98);
     }
     to {
       opacity: 1;
-      transform: none;
+      transform: translateY(0) scale(1);
     }
   }
-  @keyframes drawerin {
+  @keyframes drawer-in {
     from {
       transform: translateX(100%);
     }
     to {
-      transform: none;
+      transform: translateX(0);
+    }
+  }
+  @keyframes confetti-fall {
+    to {
+      transform: translateY(110vh) rotate(720deg);
+      opacity: 0.8;
     }
   }
 
@@ -169,14 +177,14 @@
   body {
     @apply bg-moss-900 font-body text-cream-100 antialiased;
     background-image:
-      radial-gradient(1100px 540px at 88% -12%, rgba(157, 190, 131, 0.09), transparent 62%),
-      radial-gradient(900px 620px at -12% 30%, rgba(219, 165, 69, 0.06), transparent 60%),
-      radial-gradient(760px 540px at 52% 112%, rgba(127, 163, 101, 0.06), transparent 62%);
+      radial-gradient(1100px 540px at 88% -12%, rgba(93, 148, 99, 0.08), transparent 62%),
+      radial-gradient(900px 620px at -12% 30%, rgba(207, 144, 50, 0.06), transparent 60%),
+      radial-gradient(760px 540px at 52% 112%, rgba(93, 148, 99, 0.06), transparent 62%);
     background-attachment: fixed;
   }
   ::selection {
-    background: rgba(157, 190, 131, 0.35);
-    color: #f5f1e4;
+    background: rgba(93, 148, 99, 0.28);
+    color: #232920;
   }
   h1,
   h2,
@@ -197,9 +205,9 @@
     inset: 0;
     z-index: 90;
     pointer-events: none;
-    opacity: 0.05;
-    mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.04;
+    mix-blend-mode: multiply;
+    background-image: url("image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
   .reveal {
@@ -219,18 +227,18 @@
   }
 
   .field {
-    @apply w-full rounded-md border border-moss-600 bg-moss-900/80 px-3.5 py-2.5 text-sm text-cream-100 transition outline-none placeholder:text-moss-500;
+    @apply w-full rounded-md border border-moss-600 bg-moss-850 px-3.5 py-2.5 text-sm text-cream-100 transition outline-none placeholder:text-moss-500;
   }
   .field:focus {
     border-color: var(--color-leaf-500);
-    box-shadow: 0 0 0 3px rgba(157, 190, 131, 0.16);
+    box-shadow: 0 0 0 3px rgba(93, 148, 99, 0.18);
   }
   .field-invalid {
     border-color: var(--color-clay-500);
   }
   .field-invalid:focus {
     border-color: var(--color-clay-500);
-    box-shadow: 0 0 0 3px rgba(198, 98, 69, 0.18);
+    box-shadow: 0 0 0 3px rgba(179, 79, 51, 0.18);
   }
 
   .btn-press {

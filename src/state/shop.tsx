@@ -8,7 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { FREE_SHIPPING_AT, PRODUCTS, SHIPPING_FEE, type Product } from "../data/products";
+import { PRODUCTS, money, type Product } from "../data/products";
 
 export interface CartLine {
   productId: string;
@@ -59,13 +59,14 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   const [favorites, setFavorites] = useState<string[]>(() => readLS("caituus.favs.v1", []));
   const [cartOpen, setCartOpen] = useState(false);
   const [toasts, setToasts] = useState<ToastData[]>([]);
-  const toastId = useRef(0);
+  const toastId = useRef(1);
+  const timers = useRef<number[]>([]);
 
   useEffect(() => {
     try {
       localStorage.setItem("caituus.cart.v1", JSON.stringify(lines));
     } catch {
-      /* almacenamiento no disponible */
+      /* sin almacenamiento */
     }
   }, [lines]);
 
@@ -73,27 +74,33 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     try {
       localStorage.setItem("caituus.favs.v1", JSON.stringify(favorites));
     } catch {
-      /* almacenamiento no disponible */
+      /* sin almacenamiento */
     }
   }, [favorites]);
 
+  useEffect(() => {
+    const pending = timers.current;
+    return () => pending.forEach((t) => window.clearTimeout(t));
+  }, []);
+
   const pushToast = useCallback((t: Omit<ToastData, "id">) => {
-    const id = ++toastId.current;
+    const id = toastId.current++;
     setToasts((prev) => [...prev.slice(-2), { ...t, id }]);
-    window.setTimeout(() => {
+    const timer = window.setTimeout(() => {
       setToasts((prev) => prev.filter((x) => x.id !== id));
-    }, 3600);
+    }, 3800);
+    timers.current.push(timer);
   }, []);
 
   const dismissToast = useCallback((id: number) => {
-    setToasts((prev) => prev.filter((x) => x.id !== id));
+    setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
   const addToCart = useCallback(
     (product: Product, qty = 1) => {
       setLines((prev) => {
-        const existing = prev.find((l) => l.productId === product.id);
-        if (existing) {
+        const found = prev.find((l) => l.productId === product.id);
+        if (found) {
           return prev.map((l) =>
             l.productId === product.id ? { ...l, qty: Math.min(12, l.qty + qty) } : l
           );
@@ -101,9 +108,9 @@ export function ShopProvider({ children }: { children: ReactNode }) {
         return [...prev, { productId: product.id, qty }];
       });
       pushToast({
-        title: `${product.name} agregado`,
-        sub: `${product.mg} mg · ${product.size}`,
-        ctaLabel: "Ver mi bolsa",
+        title: "Agregado a la bolsa",
+        sub: `${product.name} · ${money(product.price)}`,
+        ctaLabel: "Ver bolsa",
         onCta: () => setCartOpen(true),
       });
     },
@@ -111,9 +118,8 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   );
 
   const setQty = useCallback((productId: string, qty: number) => {
-    setLines((prev) =>
-      prev.map((l) => (l.productId === productId ? { ...l, qty: Math.max(1, Math.min(12, qty)) } : l))
-    );
+    const clamped = Math.max(1, Math.min(12, qty));
+    setLines((prev) => prev.map((l) => (l.productId === productId ? { ...l, qty: clamped } : l)));
   }, []);
 
   const removeLine = useCallback((productId: string) => {
@@ -123,22 +129,23 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   const clearCart = useCallback(() => setLines([]), []);
 
   const toggleFavorite = useCallback((id: string) => {
-    setFavorites((prev) => (prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]));
+    setFavorites((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   }, []);
 
-  const { count, subtotal } = useMemo(() => {
-    let c = 0;
-    let s = 0;
-    for (const l of lines) {
-      const p = PRODUCTS.find((p) => p.id === l.productId);
-      if (!p) continue;
-      c += l.qty;
-      s += p.price * l.qty;
-    }
-    return { count: c, subtotal: s };
-  }, [lines]);
+  const subtotal = useMemo(
+    () =>
+      lines.reduce((sum, l) => {
+        const p = PRODUCTS.find((x) => x.id === l.productId);
+        return sum + (p ? p.price * l.qty : 0);
+      }, 0),
+    [lines]
+  );
 
-  const shipping = subtotal === 0 || subtotal >= FREE_SHIPPING_AT ? 0 : SHIPPING_FEE;
+  const count = useMemo(() => lines.reduce((s, l) => s + l.qty, 0), [lines]);
+
+  /* El sitio original no cobra el envío en línea: se paga a la
+     transportadora contraentrega. El envío se reporta como 0. */
+  const shipping = 0;
   const total = subtotal + shipping;
 
   const value: ShopContextValue = {
@@ -163,8 +170,8 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   return <ShopContext.Provider value={value}>{children}</ShopContext.Provider>;
 }
 
-export function useShop(): ShopContextValue {
+export function useShop() {
   const ctx = useContext(ShopContext);
-  if (!ctx) throw new Error("useShop debe usarse dentro de <ShopProvider>");
+  if (!ctx) throw new Error("useShop debe usarse dentro de ShopProvider");
   return ctx;
 }

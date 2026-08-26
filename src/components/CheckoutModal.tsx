@@ -1,56 +1,100 @@
-import { useEffect, useState } from "react";
-import confetti from "canvas-confetti";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   PAYMENT_METHODS,
+  PAYU_LOGO,
   PRODUCTS,
   PSE_BANKS,
+  PURCHASE_TERMS,
   money,
-  type PaymentMethod,
 } from "../data/products";
 import { useShop } from "../state/shop";
-import {
-  ArrowLeftIcon,
-  BankIcon,
-  CheckIcon,
-  LockIcon,
-  TruckIcon,
-  WalletIcon,
-  XIcon,
-} from "./icons";
+import { ArrowLeftIcon, CheckIcon, ChevronDownIcon, LockIcon, TruckIcon, XIcon } from "./icons";
 
 interface CheckoutModalProps {
   open: boolean;
   onClose: () => void;
 }
 
-type Step = "details" | "payment" | "processing" | "success";
+type Step = "form" | "processing" | "success" | "pending" | "rejected";
 
-const PROCESSING_MESSAGES: Record<string, string> = {
-  nequi: "Esperando la aprobación en tu Nequi…",
-  daviplata: "Confirmando el pago en tu Daviplata…",
-  pse: "Contactando tu banco por PSE…",
-  card: "Verificando tu tarjeta de forma segura…",
-  cod: "Reservando tu pedido para contraentrega…",
+interface FormState {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  cardNumber: string;
+  expiry: string;
+  cvc: string;
+  bank: string;
+}
+
+const initialForm: FormState = {
+  name: "",
+  email: "",
+  phone: "",
+  address: "",
+  city: "",
+  cardNumber: "",
+  expiry: "",
+  cvc: "",
+  bank: "",
 };
 
-function formatCardNumber(v: string) {
-  return v.replace(/\D/g, "").slice(0, 16).replace(/(.{4})/g, "$1 ").trim();
+const CONFETTI_COLORS = ["#5d9463", "#cf9032", "#3f7189", "#c05f41", "#f8f6ec", "#37563c"];
+
+function Confetti() {
+  const pieces = useMemo(
+    () =>
+      Array.from({ length: 60 }, (_, i) => ({
+        left: (i * 61) % 100,
+        delay: (i % 12) * 0.12,
+        dur: 2.6 + (i % 5) * 0.5,
+        color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+        w: 5 + (i % 3) * 3,
+        rot: (i * 47) % 360,
+      })),
+    []
+  );
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+      {pieces.map((p, i) => (
+        <span
+          key={i}
+          className="absolute top-[-4%] rounded-[2px]"
+          style={{
+            left: `${p.left}%`,
+            width: p.w,
+            height: p.w * 1.7,
+            background: p.color,
+            transform: `rotate(${p.rot}deg)`,
+            animation: `confetti-fall ${p.dur}s ${p.delay}s linear forwards`,
+          }}
+        />
+      ))}
+    </div>
+  );
 }
 
 export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
-  const { lines, subtotal, shipping, total, clearCart, pushToast } = useShop();
-  const [step, setStep] = useState<Step>("details");
-  const [form, setForm] = useState({ name: "", phone: "", email: "", city: "Bogotá", address: "" });
+  const { lines, subtotal, shipping, total, clearCart, count } = useShop();
+  const [step, setStep] = useState<Step>("form");
+  const [method, setMethod] = useState("card");
+  const [form, setForm] = useState<FormState>(initialForm);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [methodId, setMethodId] = useState("nequi");
-  const [payPhone, setPayPhone] = useState("");
-  const [bank, setBank] = useState(PSE_BANKS[0]);
-  const [card, setCard] = useState({ number: "", holder: "", expiry: "", cvv: "" });
-  const [payError, setPayError] = useState("");
-  const [orderNumber, setOrderNumber] = useState("");
+  const [orderRef, setOrderRef] = useState("");
+  const [cashRef, setCashRef] = useState("");
   const [paidTotal, setPaidTotal] = useState(0);
-  const [paidMethod, setPaidMethod] = useState("");
-  const [shipCity, setShipCity] = useState("Bogotá");
+  const timer = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (open) {
+      setStep("form");
+      setErrors({});
+      setOrderRef("");
+      setCashRef("");
+    }
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -62,408 +106,383 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
   }, [open, step, onClose]);
 
   useEffect(() => {
-    if (open) {
-      setStep("details");
-      setErrors({});
-      setPayError("");
-    }
-  }, [open]);
+    return () => {
+      if (timer.current) window.clearTimeout(timer.current);
+    };
+  }, []);
 
   useEffect(() => {
-    if (step !== "processing") return;
-    const method = PAYMENT_METHODS.find((m) => m.id === methodId);
-    const t = window.setTimeout(() => {
-      const num = `CA-${Date.now().toString(36).slice(-6).toUpperCase()}`;
-      setOrderNumber(num);
-      setPaidTotal(total);
-      setPaidMethod(method?.label ?? "");
-      setShipCity(form.city);
-      setStep("success");
-      clearCart();
-      pushToast({ title: "¡Pedido confirmado!", sub: `${num} · ${method?.label}`, kind: "success" });
-      confetti({
-        particleCount: 140,
-        spread: 80,
-        origin: { y: 0.55 },
-        colors: ["#9DBE83", "#E8B960", "#F5F1E4", "#7FA365", "#DBA545"],
-      });
-    }, 2400);
-    return () => window.clearTimeout(t);
-  }, [step, methodId, total, clearCart, pushToast, form.city]);
+    if (step === "success") {
+      const id = window.setTimeout(() => clearCart(), 400);
+      return () => window.clearTimeout(id);
+    }
+  }, [step, clearCart]);
 
   if (!open) return null;
 
-  const method = PAYMENT_METHODS.find((m) => m.id === methodId) as PaymentMethod;
+  const methodMeta = PAYMENT_METHODS.find((m) => m.id === method)!;
+  const isCard = methodMeta.kind === "card";
+  const isPse = methodMeta.kind === "pse";
+  const isCash = methodMeta.kind === "cash";
 
-  const validateDetails = () => {
+  const set = (k: keyof FormState, v: string) => {
+    setForm((f) => ({ ...f, [k]: v }));
+    setErrors((e) => ({ ...e, [k]: "" }));
+  };
+
+  const validate = () => {
     const e: Record<string, string> = {};
     if (form.name.trim().length < 3) e.name = "Escribe tu nombre completo";
-    if (!/^\d{10}$/.test(form.phone.replace(/\s/g, ""))) e.phone = "Teléfono de 10 dígitos";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = "Correo no válido";
-    if (form.address.trim().length < 6) e.address = "Dirección muy corta";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = "Correo inválido";
+    if (form.phone.replace(/\D/g, "").length < 7) e.phone = "Teléfono inválido";
+    if (form.address.trim().length < 5) e.address = "Escribe tu dirección de entrega";
+    if (form.city.trim().length < 2) e.city = "Escribe tu ciudad";
+    if (isCard) {
+      if (form.cardNumber.replace(/\s/g, "").length !== 16) e.cardNumber = "Número de 16 dígitos";
+      if (!/^\d{2}\/\d{2}$/.test(form.expiry)) e.expiry = "MM/AA";
+      if (form.cvc.length < 3) e.cvc = "CVC";
+    }
+    if (isPse && !form.bank) e.bank = "Selecciona tu banco";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
 
-  const goPayment = () => {
-    if (validateDetails()) setStep("payment");
-  };
-
-  const validatePayment = () => {
-    setPayError("");
-    if (method.kind === "phone") {
-      if (!/^\d{10}$/.test(payPhone.replace(/\s/g, ""))) {
-        setPayError(`Ingresa el celular de tu ${method.label} (10 dígitos)`);
-        return false;
-      }
-    }
-    if (method.kind === "card") {
-      if (card.number.replace(/\s/g, "").length !== 16) {
-        setPayError("El número de tarjeta debe tener 16 dígitos");
-        return false;
-      }
-      if (card.holder.trim().length < 3) {
-        setPayError("Escribe el nombre como aparece en la tarjeta");
-        return false;
-      }
-      if (!/^\d{2}\/\d{2}$/.test(card.expiry)) {
-        setPayError("Vencimiento en formato MM/AA");
-        return false;
-      }
-      if (!/^\d{3,4}$/.test(card.cvv)) {
-        setPayError("CVV de 3 o 4 dígitos");
-        return false;
-      }
-    }
-    return true;
-  };
-
-  const pay = () => {
-    if (!validatePayment()) return;
+  const placeOrder = () => {
+    if (!validate()) return;
+    setPaidTotal(total);
     setStep("processing");
+    const ref = `CT-${Math.floor(100000 + Math.random() * 900000)}`;
+    setOrderRef(ref);
+    if (isCash) setCashRef(String(Math.floor(1000000000 + Math.random() * 9000000000)));
+
+    timer.current = window.setTimeout(() => {
+      if (isCash) {
+        setStep("pending"); // Baloto / Efecty: pago pendiente hasta confirmar en efectivo
+      } else if (isCard && form.cardNumber.replace(/\s/g, "").startsWith("0000")) {
+        setStep("rejected"); // Tarjeta de prueba rechazada
+      } else {
+        setStep("success");
+      }
+    }, 1800);
   };
 
-  const input = (key: keyof typeof form, label: string, placeholder: string, type = "text") => (
-    <div>
-      <label htmlFor={`f-${key}`} className="font-mono text-[10px] tracking-[0.2em] text-moss-500 uppercase">
-        {label}
-      </label>
-      <input
-        id={`f-${key}`}
-        type={type}
-        value={form[key]}
-        onChange={(e) => {
-          setForm({ ...form, [key]: e.target.value });
-          setErrors((prev) => ({ ...prev, [key]: "" }));
-        }}
-        placeholder={placeholder}
-        className={`field mt-1.5 ${errors[key] ? "field-invalid" : ""}`}
-      />
-      {errors[key] && <p className="mt-1 text-xs font-medium text-clay-400">{errors[key]}</p>}
-    </div>
-  );
+  const fmtCard = (v: string) =>
+    v.replace(/\D/g, "").slice(0, 16).replace(/(\d{4})(?=\d)/g, "$1 ");
+  const fmtExpiry = (v: string) => {
+    const d = v.replace(/\D/g, "").slice(0, 4);
+    return d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d;
+  };
+
+  const inputCls = (k: string) => `field ${errors[k] ? "field-invalid" : ""}`;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-6" role="dialog" aria-modal="true" aria-label="Finalizar compra">
+    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-6" role="dialog" aria-modal="true" aria-label="Pago seguro">
       <button
-        className="absolute inset-0 animate-fade cursor-default bg-moss-950/80 backdrop-blur-[3px]"
+        className="absolute inset-0 animate-fade cursor-default bg-moss-950/70 backdrop-blur-[2px]"
         onClick={() => step !== "processing" && onClose()}
-        aria-label="Cerrar"
+        aria-label="Cerrar pago"
       />
-      <div className="animate-panel-in scroll-slim relative max-h-[94vh] w-full max-w-2xl overflow-y-auto rounded-t-xl border border-moss-600/70 bg-moss-850 shadow-[0_40px_90px_-30px_rgba(11,19,12,1)] sm:rounded-xl">
-        {step !== "processing" && (
-          <button
-            onClick={onClose}
-            className="btn-press absolute top-4 right-4 z-10 grid h-9 w-9 place-items-center rounded-full border border-moss-600 bg-moss-900/80 text-cream-300 hover:border-cream-300/40 hover:text-cream-100"
-            aria-label="Cerrar"
-          >
-            <XIcon className="h-4 w-4" />
-          </button>
-        )}
+      <div className="animate-panel-in scroll-slim relative max-h-[94vh] w-full max-w-2xl overflow-y-auto rounded-t-xl border border-moss-600 bg-moss-850 shadow-[0_40px_90px_-30px_rgba(43,50,42,0.6)] sm:rounded-xl">
+        <Confetti />
 
-        {step === "details" && (
-          <div className="p-6 sm:p-8">
-            <p className="font-mono text-[10px] tracking-[0.24em] text-leaf-500 uppercase">Paso 1 de 2</p>
-            <h2 className="mt-1.5 font-display text-3xl text-cream-100">Datos de envío</h2>
-
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              {input("name", "Nombre completo", "María Fernanda Ríos")}
-              {input("phone", "Celular / WhatsApp", "300 123 4567", "tel")}
-              {input("email", "Correo electrónico", "maria@correo.co", "email")}
+        {step === "form" && (
+          <>
+            <header className="sticky top-0 z-10 flex items-center justify-between border-b border-moss-700 bg-moss-850/95 px-6 py-4 backdrop-blur">
               <div>
-                <label htmlFor="f-city" className="font-mono text-[10px] tracking-[0.2em] text-moss-500 uppercase">
-                  Ciudad
-                </label>
-                <select
-                  id="f-city"
-                  value={form.city}
-                  onChange={(e) => setForm({ ...form, city: e.target.value })}
-                  className="field mt-1.5 cursor-pointer"
-                >
-                  {["Bogotá", "Medellín", "Cali", "Barranquilla", "Bucaramanga", "Cartagena", "Otra ciudad"].map((c) => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
-                </select>
+                <h2 className="font-display text-2xl font-semibold text-cream-100">Finalizar compra</h2>
+                <p className="mt-0.5 flex items-center gap-2 font-mono text-[10px] tracking-[0.16em] text-cream-300 uppercase">
+                  <img src={PAYU_LOGO} alt="PayU" className="h-4 brightness-150" /> Pasarela segura
+                </p>
               </div>
-              <div className="sm:col-span-2">
-                {input("address", "Dirección de entrega", "Cra 13 # 85 - 24, Apto 502")}
-              </div>
-            </div>
-
-            <div className="mt-6 rounded-md border border-moss-700 bg-moss-900/60 p-4">
-              <ul className="max-h-32 space-y-2 overflow-y-auto">
-                {lines.map((l) => {
-                  const p = PRODUCTS.find((x) => x.id === l.productId);
-                  if (!p) return null;
-                  return (
-                    <li key={l.productId} className="flex justify-between gap-4 text-[13px]">
-                      <span className="text-cream-300/85">
-                        {l.qty} × {p.name}
-                      </span>
-                      <span className="font-mono text-cream-100">{money(p.price * l.qty)}</span>
-                    </li>
-                  );
-                })}
-              </ul>
-              <div className="mt-3 flex justify-between border-t border-moss-700 pt-3 text-sm font-bold text-cream-100">
-                <span>Total con envío</span>
-                <span className="font-mono">{money(total)}</span>
-              </div>
-            </div>
-
-            <div className="mt-6 flex items-center justify-between gap-3">
-              <button onClick={onClose} className="btn-press flex items-center gap-2 text-sm font-semibold text-cream-300 hover:text-cream-100">
-                <ArrowLeftIcon className="h-4 w-4" /> Volver a la tienda
-              </button>
               <button
-                onClick={goPayment}
-                className="btn-press rounded-md bg-amber-500 px-6 py-3 text-sm font-bold text-moss-950 hover:bg-amber-400"
+                onClick={onClose}
+                className="btn-press grid h-9 w-9 place-items-center rounded-full border border-moss-600 text-cream-200 hover:border-cream-300/50 hover:text-cream-100"
+                aria-label="Cerrar"
               >
-                Continuar al pago
+                <XIcon className="h-4 w-4" />
               </button>
-            </div>
-          </div>
-        )}
+            </header>
 
-        {step === "payment" && (
-          <div className="p-6 sm:p-8">
-            <p className="font-mono text-[10px] tracking-[0.24em] text-leaf-500 uppercase">Paso 2 de 2</p>
-            <h2 className="mt-1.5 font-display text-3xl text-cream-100">Método de pago</h2>
-            <p className="mt-1 text-sm text-cream-300/70">Elige cómo quieres pagar tu pedido de {money(total)}.</p>
-
-            <div className="mt-5 grid gap-2.5" role="radiogroup" aria-label="Método de pago">
-              {PAYMENT_METHODS.map((m) => {
-                const active = methodId === m.id;
-                return (
-                  <button
-                    key={m.id}
-                    onClick={() => {
-                      setMethodId(m.id);
-                      setPayError("");
-                    }}
-                    role="radio"
-                    aria-checked={active}
-                    className={`btn-press flex items-center gap-4 rounded-md border p-3.5 text-left ${
-                      active ? "border-leaf-500 bg-moss-700/60" : "border-moss-600 bg-moss-800 hover:border-moss-500"
-                    }`}
-                  >
-                    <span
-                      className={`grid h-10 w-10 shrink-0 place-items-center rounded-md ${
-                        active ? "bg-leaf-500/20 text-leaf-300" : "bg-moss-700 text-cream-300/60"
-                      }`}
-                    >
-                      {m.kind === "card" ? <WalletIcon className="h-5 w-5" /> : m.kind === "bank" ? <BankIcon className="h-5 w-5" /> : <TruckIcon className="h-5 w-5" />}
-                    </span>
-                    <span className="flex-1">
-                      <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                        <span className={`text-sm font-bold ${active ? "text-cream-100" : "text-cream-200"}`}>{m.label}</span>
-                        <span className="rounded-full bg-moss-700 px-2 py-0.5 font-mono text-[9px] tracking-[0.12em] text-cream-300/70 uppercase">
-                          {m.tag}
+            <div className="px-6 py-5">
+              <section className="rounded-lg border border-moss-700 bg-moss-900/60 p-4">
+                <p className="font-mono text-[10px] tracking-[0.22em] text-cream-300 uppercase">Tu pedido · {count} {count === 1 ? "producto" : "productos"}</p>
+                <ul className="mt-3 space-y-2">
+                  {lines.map((l) => {
+                    const p = PRODUCTS.find((x) => x.id === l.productId);
+                    if (!p) return null;
+                    return (
+                      <li key={l.productId} className="flex items-center justify-between gap-3 text-sm">
+                        <span className="flex items-center gap-3">
+                          <img src={p.image} alt="" className="h-10 w-9 rounded border border-moss-700 bg-white object-cover" />
+                          <span className="text-cream-100">
+                            {p.name} <span className="font-mono text-xs text-cream-300">× {l.qty}</span>
+                          </span>
                         </span>
-                      </span>
-                      <span className="mt-0.5 block text-xs text-cream-300/60">{m.hint}</span>
-                    </span>
-                    <span
-                      className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border ${
-                        active ? "border-leaf-500 bg-leaf-500 text-moss-950" : "border-moss-500"
-                      }`}
-                    >
-                      {active && <CheckIcon className="h-3 w-3" strokeWidth={3} />}
-                    </span>
-                  </button>
-                );
-              })}
+                        <span className="font-mono text-cream-100">{money(p.price * l.qty)}</span>
+                      </li>
+                    );
+                  })}
+                </ul>
+                <div className="mt-3 flex items-center justify-between border-t border-dashed border-moss-700 pt-3 text-sm">
+                  <span className="text-cream-300">Envío (contraentrega)</span>
+                  <span className="font-mono text-amber-400">{shipping === 0 ? "Se paga al recibir" : money(shipping)}</span>
+                </div>
+                <div className="mt-2 flex items-center justify-between text-base font-bold text-cream-100">
+                  <span>Total a pagar hoy</span>
+                  <span className="font-mono text-lg">{money(total)}</span>
+                </div>
+              </section>
+
+              <section className="mt-6">
+                <h3 className="font-mono text-[10px] tracking-[0.22em] text-cream-300 uppercase">1 · Datos de entrega</h3>
+                <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                  <div>
+                    <input className={inputCls("name")} placeholder="Nombre completo *" value={form.name} onChange={(e) => set("name", e.target.value)} />
+                    {errors.name && <p className="mt-1 text-xs font-medium text-clay-400">{errors.name}</p>}
+                  </div>
+                  <div>
+                    <input className={inputCls("email")} placeholder="Correo electrónico *" value={form.email} onChange={(e) => set("email", e.target.value)} />
+                    {errors.email && <p className="mt-1 text-xs font-medium text-clay-400">{errors.email}</p>}
+                  </div>
+                  <div>
+                    <input className={inputCls("phone")} placeholder="Teléfono / WhatsApp *" value={form.phone} onChange={(e) => set("phone", e.target.value.replace(/[^\d\s]/g, ""))} />
+                    {errors.phone && <p className="mt-1 text-xs font-medium text-clay-400">{errors.phone}</p>}
+                  </div>
+                  <div>
+                    <input className={inputCls("city")} placeholder="Ciudad *" value={form.city} onChange={(e) => set("city", e.target.value)} />
+                    {errors.city && <p className="mt-1 text-xs font-medium text-clay-400">{errors.city}</p>}
+                  </div>
+                  <div className="sm:col-span-2">
+                    <input className={inputCls("address")} placeholder="Dirección de entrega *" value={form.address} onChange={(e) => set("address", e.target.value)} />
+                    {errors.address && <p className="mt-1 text-xs font-medium text-clay-400">{errors.address}</p>}
+                  </div>
+                </div>
+                <p className="mt-2 flex items-start gap-1.5 text-[11px] leading-snug text-cream-300">
+                  <TruckIcon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-400" />
+                  El valor del envío se paga directamente a la empresa de mensajería al momento de la entrega. Te enviaremos la guía por WhatsApp o correo.
+                </p>
+              </section>
+
+              <section className="mt-6">
+                <h3 className="font-mono text-[10px] tracking-[0.22em] text-cream-300 uppercase">2 · Método de pago</h3>
+                <div className="mt-3 grid gap-2.5 sm:grid-cols-2">
+                  {PAYMENT_METHODS.map((m) => {
+                    const active = method === m.id;
+                    return (
+                      <button
+                        key={m.id}
+                        onClick={() => {
+                          setMethod(m.id);
+                          setErrors({});
+                        }}
+                        aria-pressed={active}
+                        className={`btn-press rounded-lg border p-3.5 text-left transition-all ${
+                          active
+                            ? "border-leaf-500 bg-leaf-500/10 shadow-[0_8px_20px_-12px_rgba(93,148,99,0.5)]"
+                            : "border-moss-600 bg-moss-900/60 hover:border-moss-500"
+                        }`}
+                      >
+                        <span className="flex items-center justify-between gap-2">
+                          <span className="flex items-center gap-2.5">
+                            {m.logos ? (
+                              <span className="flex gap-1">
+                                {m.logos.map((l) => (
+                                  <img key={l} src={l} alt="" className="h-5 rounded-sm bg-white px-0.5 object-contain" />
+                                ))}
+                              </span>
+                            ) : (
+                              <img src={m.logo} alt="" className="h-6 rounded-sm bg-white px-1 object-contain" />
+                            )}
+                          </span>
+                          <span
+                            className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border ${
+                              active ? "border-leaf-500 bg-leaf-500 text-moss-900" : "border-moss-500"
+                            }`}
+                          >
+                            {active && <CheckIcon className="h-3 w-3" />}
+                          </span>
+                        </span>
+                        <span className="mt-2 block text-[13px] font-bold text-cream-100">{m.label}</span>
+                        <span className="mt-0.5 block text-[11px] leading-snug text-cream-300">{m.hint}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {isCard && (
+                  <div className="mt-4 grid animate-rise gap-3 sm:grid-cols-2">
+                    <div className="sm:col-span-2">
+                      <input
+                        className={inputCls("cardNumber")}
+                        placeholder="Número de tarjeta *  (0000… para simular rechazo)"
+                        inputMode="numeric"
+                        value={form.cardNumber}
+                        onChange={(e) => set("cardNumber", fmtCard(e.target.value))}
+                      />
+                      {errors.cardNumber && <p className="mt-1 text-xs font-medium text-clay-400">{errors.cardNumber}</p>}
+                    </div>
+                    <div>
+                      <input className={inputCls("expiry")} placeholder="MM/AA *" inputMode="numeric" value={form.expiry} onChange={(e) => set("expiry", fmtExpiry(e.target.value))} />
+                      {errors.expiry && <p className="mt-1 text-xs font-medium text-clay-400">{errors.expiry}</p>}
+                    </div>
+                    <div>
+                      <input className={inputCls("cvc")} placeholder="CVC *" inputMode="numeric" maxLength={4} value={form.cvc} onChange={(e) => set("cvc", e.target.value.replace(/\D/g, ""))} />
+                      {errors.cvc && <p className="mt-1 text-xs font-medium text-clay-400">{errors.cvc}</p>}
+                    </div>
+                  </div>
+                )}
+
+                {isPse && (
+                  <div className="relative mt-4 animate-rise">
+                    <select className={`${inputCls("bank")} cursor-pointer appearance-none pr-9`} value={form.bank} onChange={(e) => set("bank", e.target.value)}>
+                      <option value="">Selecciona tu banco *</option>
+                      {PSE_BANKS.map((b) => (
+                        <option key={b} value={b}>{b}</option>
+                      ))}
+                    </select>
+                    <ChevronDownIcon className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-moss-500" />
+                    {errors.bank && <p className="mt-1 text-xs font-medium text-clay-400">{errors.bank}</p>}
+                    <p className="mt-2 text-[11px] text-cream-300">Serás redirigido a tu banco para aprobar el débito. Al volver, confirmaremos tu pedido.</p>
+                  </div>
+                )}
+
+                {isCash && (
+                  <div className="mt-4 animate-rise rounded-md border border-amber-500/50 bg-amber-500/10 p-4">
+                    <p className="text-[13px] font-bold text-cream-100">
+                      {methodMeta.label}: pago en efectivo
+                    </p>
+                    <p className="mt-1 text-[12px] leading-relaxed text-cream-200">
+                      Al confirmar generaremos una <strong>referencia de pago</strong>. Acércate a cualquier punto{" "}
+                      {methodMeta.label} y presenta la referencia. Tu pedido quedará{" "}
+                      <strong>pendiente</strong> hasta que el pago se confirme — te avisaremos por WhatsApp o correo.
+                    </p>
+                  </div>
+                )}
+
+                {methodMeta.kind === "wallet" && (
+                  <div className="mt-4 animate-rise rounded-md border border-moss-600 bg-moss-900/60 p-4">
+                    <p className="text-[12px] leading-relaxed text-cream-200">
+                      Serás redirigido a PayPal para completar el pago de forma segura. Al finalizar, volverás a esta tienda con tu pedido confirmado.
+                    </p>
+                  </div>
+                )}
+              </section>
+
+              <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <p className="flex items-center gap-2 font-mono text-[10px] tracking-[0.14em] text-cream-300 uppercase">
+                  <LockIcon className="h-4 w-4 text-leaf-400" /> Pago cifrado SSL · Procesado por PayU
+                </p>
+                <button
+                  onClick={placeOrder}
+                  className="btn-press rounded-md bg-amber-500 px-8 py-3.5 text-sm font-bold text-moss-950 shadow-[0_10px_24px_-12px_rgba(207,144,50,0.7)] hover:bg-amber-400"
+                >
+                  {isCash ? `Generar referencia · ${money(total)}` : `Pagar ${money(total)}`}
+                </button>
+              </div>
+              <p className="mt-3 text-center font-mono text-[9px] tracking-[0.12em] text-cream-300 uppercase">
+                Demo — no se procesa ningún pago real
+              </p>
             </div>
-
-            {method.kind === "phone" && (
-              <div className="mt-4 animate-rise">
-                <label htmlFor="pay-phone" className="font-mono text-[10px] tracking-[0.2em] text-moss-500 uppercase">
-                  Celular registrado en {method.label}
-                </label>
-                <input
-                  id="pay-phone"
-                  inputMode="numeric"
-                  value={payPhone}
-                  onChange={(e) => setPayPhone(e.target.value.replace(/[^\d\s]/g, "").slice(0, 12))}
-                  placeholder="300 123 4567"
-                  className="field mt-1.5"
-                />
-              </div>
-            )}
-
-            {method.kind === "bank" && (
-              <div className="mt-4 animate-rise">
-                <label htmlFor="pay-bank" className="font-mono text-[10px] tracking-[0.2em] text-moss-500 uppercase">
-                  Tu banco
-                </label>
-                <select id="pay-bank" value={bank} onChange={(e) => setBank(e.target.value)} className="field mt-1.5 cursor-pointer">
-                  {PSE_BANKS.map((b) => (
-                    <option key={b} value={b}>{b}</option>
-                  ))}
-                </select>
-              </div>
-            )}
-
-            {method.kind === "card" && (
-              <div className="mt-4 grid animate-rise gap-4 sm:grid-cols-2">
-                <div className="sm:col-span-2">
-                  <label htmlFor="card-number" className="font-mono text-[10px] tracking-[0.2em] text-moss-500 uppercase">
-                    Número de tarjeta
-                  </label>
-                  <input
-                    id="card-number"
-                    inputMode="numeric"
-                    value={card.number}
-                    onChange={(e) => setCard({ ...card, number: formatCardNumber(e.target.value) })}
-                    placeholder="4242 4242 4242 4242"
-                    className="field mt-1.5 font-mono"
-                  />
-                </div>
-                <div className="sm:col-span-2">
-                  <label htmlFor="card-holder" className="font-mono text-[10px] tracking-[0.2em] text-moss-500 uppercase">
-                    Titular
-                  </label>
-                  <input
-                    id="card-holder"
-                    value={card.holder}
-                    onChange={(e) => setCard({ ...card, holder: e.target.value.toUpperCase() })}
-                    placeholder="MARIA F RIOS"
-                    className="field mt-1.5"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="card-expiry" className="font-mono text-[10px] tracking-[0.2em] text-moss-500 uppercase">
-                    Vencimiento
-                  </label>
-                  <input
-                    id="card-expiry"
-                    inputMode="numeric"
-                    value={card.expiry}
-                    onChange={(e) => {
-                      const d = e.target.value.replace(/\D/g, "").slice(0, 4);
-                      setCard({ ...card, expiry: d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d });
-                    }}
-                    placeholder="12/27"
-                    className="field mt-1.5 font-mono"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="card-cvv" className="font-mono text-[10px] tracking-[0.2em] text-moss-500 uppercase">
-                    CVV
-                  </label>
-                  <input
-                    id="card-cvv"
-                    inputMode="numeric"
-                    type="password"
-                    value={card.cvv}
-                    onChange={(e) => setCard({ ...card, cvv: e.target.value.replace(/\D/g, "").slice(0, 4) })}
-                    placeholder="•••"
-                    className="field mt-1.5 font-mono"
-                  />
-                </div>
-              </div>
-            )}
-
-            {payError && (
-              <p className="mt-3 animate-rise text-sm font-medium text-clay-400">{payError}</p>
-            )}
-
-            <div className="mt-6 flex items-center justify-between gap-3">
-              <button onClick={() => setStep("details")} className="btn-press flex items-center gap-2 text-sm font-semibold text-cream-300 hover:text-cream-100">
-                <ArrowLeftIcon className="h-4 w-4" /> Datos de envío
-              </button>
-              <button
-                onClick={pay}
-                className="btn-press flex items-center gap-2 rounded-md bg-leaf-500 px-6 py-3 text-sm font-bold text-moss-950 hover:bg-leaf-400"
-              >
-                <LockIcon className="h-4 w-4" />
-                {method.kind === "none" ? "Confirmar pedido" : `Pagar ${money(total)}`}
-              </button>
-            </div>
-            <p className="mt-3 flex items-center justify-center gap-1.5 font-mono text-[10px] tracking-[0.12em] text-moss-500 uppercase">
-              <LockIcon className="h-3 w-3" /> Demo — no se procesa ningún pago real
-            </p>
-          </div>
+          </>
         )}
 
         {step === "processing" && (
-          <div className="flex flex-col items-center px-6 py-16 text-center sm:py-20">
-            <div className="relative h-16 w-16">
-              <span className="absolute inset-0 animate-slowspin rounded-full border-2 border-moss-600 border-t-leaf-400" style={{ animationDuration: "1s" }} />
-              <LeafGlyph />
-            </div>
-            <h2 className="mt-6 font-display text-3xl text-cream-100">Procesando tu pago…</h2>
-            <p className="mt-2 font-mono text-xs tracking-[0.1em] text-cream-300/70" aria-live="polite">
-              {PROCESSING_MESSAGES[methodId]}
+          <div className="flex flex-col items-center px-6 py-20 text-center">
+            <span className="h-14 w-14 animate-spin rounded-full border-4 border-moss-600 border-t-amber-500" />
+            <h2 className="mt-6 font-display text-2xl font-semibold text-cream-100">Procesando tu pago…</h2>
+            <p className="mt-2 max-w-sm text-sm text-cream-200">
+              Estamos confirmando la transacción con {methodMeta.label} a través de PayU. No cierres esta ventana.
+            </p>
+            <p className="mt-5 font-mono text-[10px] tracking-[0.18em] text-cream-300 uppercase">
+              Orden {orderRef}
             </p>
           </div>
         )}
 
         {step === "success" && (
-          <div className="p-6 text-center sm:p-10">
+          <div className="relative px-6 py-12 text-center sm:px-12">
             <span className="mx-auto grid h-16 w-16 animate-pop place-items-center rounded-full bg-leaf-500/20 text-leaf-300">
               <CheckIcon className="h-8 w-8" />
             </span>
-            <h2 className="mt-5 font-display text-4xl text-cream-100">¡Gracias por tu pedido!</h2>
-            <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-cream-300/85">
-              Tu pago con <strong className="text-cream-100">{paidMethod}</strong> fue confirmado. Te
-              escribiremos por WhatsApp para coordinar la entrega en{" "}
-              <strong className="text-cream-100">{shipCity}</strong>.
+            <p className="mt-5 font-mono text-[10px] tracking-[0.24em] text-leaf-400 uppercase">Orden {orderRef} · aprobada</p>
+            <h2 className="mt-2 font-display text-4xl font-semibold text-cream-100">¡Gracias por su compra!</h2>
+            <p className="mt-1 font-display text-xl text-leaf-300 italic">Su pago ha sido exitoso</p>
+            <ul className="mx-auto mt-6 max-w-md space-y-2.5 text-left">
+              {PURCHASE_TERMS.map((t) => (
+                <li key={t} className="flex items-start gap-2.5 text-[13px] leading-snug text-cream-200">
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" />
+                  {t}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-6 font-mono text-[11px] tracking-[0.14em] text-cream-300 uppercase">
+              Pagaste {money(paidTotal)} con {methodMeta.label}
             </p>
-
-            <div className="mx-auto mt-6 max-w-sm rounded-md border border-dashed border-moss-600 bg-moss-900/60 p-5 text-left">
-              <div className="flex justify-between">
-                <span className="font-mono text-[9px] tracking-[0.2em] text-moss-500 uppercase">Pedido</span>
-                <span className="font-mono text-sm font-bold text-amber-300">{orderNumber}</span>
-              </div>
-              <div className="mt-2 flex justify-between">
-                <span className="font-mono text-[9px] tracking-[0.2em] text-moss-500 uppercase">Pagado</span>
-                <span className="font-mono text-sm font-bold text-cream-100">{money(paidTotal)}</span>
-              </div>
-              <div className="mt-2 flex justify-between">
-                <span className="font-mono text-[9px] tracking-[0.2em] text-moss-500 uppercase">Entrega estimada</span>
-                <span className="font-mono text-sm font-bold text-leaf-300">24 – 72 h</span>
-              </div>
-            </div>
-
             <button
               onClick={onClose}
-              className="btn-press mt-7 rounded-full bg-amber-500 px-8 py-3 text-sm font-bold text-moss-950 hover:bg-amber-400"
+              className="btn-press mt-6 rounded-full bg-leaf-600 px-8 py-3 text-sm font-bold text-moss-900 hover:bg-leaf-500"
             >
-              Seguir explorando
+              Volver al inicio
             </button>
+          </div>
+        )}
+
+        {step === "pending" && (
+          <div className="px-6 py-12 text-center sm:px-12">
+            <span className="mx-auto grid h-16 w-16 animate-pop place-items-center rounded-full bg-amber-500/20 text-amber-300">
+              <span className="h-3 w-3 animate-pulse-dot rounded-full bg-amber-400" />
+            </span>
+            <p className="mt-5 font-mono text-[10px] tracking-[0.24em] text-amber-400 uppercase">Orden {orderRef} · pendiente</p>
+            <h2 className="mt-2 font-display text-4xl font-semibold text-cream-100">Tu pago quedó pendiente</h2>
+            <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-cream-200">
+              Presenta esta referencia en cualquier punto <strong>{methodMeta.label}</strong> para completar tu pago.
+              Una vez confirmado, tu producto será llevado a la empresa de mensajería dentro de las próximas 24 horas.
+            </p>
+            <div className="mx-auto mt-6 max-w-xs rounded-lg border border-dashed border-amber-500/60 bg-amber-500/10 px-6 py-4">
+              <p className="font-mono text-[10px] tracking-[0.2em] text-cream-300 uppercase">Referencia de pago</p>
+              <p className="mt-1 font-mono text-2xl font-bold tracking-wider text-cream-100">{cashRef}</p>
+              <p className="mt-1 font-mono text-[11px] text-cream-300">Valor: {money(paidTotal)}</p>
+            </div>
+            <p className="mt-4 text-[12px] text-cream-300">
+              Te enviaremos la confirmación y la guía de transporte a tu WhatsApp o correo.
+            </p>
+            <button
+              onClick={onClose}
+              className="btn-press mt-6 rounded-full bg-amber-500 px-8 py-3 text-sm font-bold text-moss-950 hover:bg-amber-400"
+            >
+              Entendido, volver al inicio
+            </button>
+          </div>
+        )}
+
+        {step === "rejected" && (
+          <div className="px-6 py-12 text-center sm:px-12">
+            <span className="mx-auto grid h-16 w-16 animate-pop place-items-center rounded-full bg-clay-500/20 text-clay-400">
+              <XIcon className="h-8 w-8" />
+            </span>
+            <p className="mt-5 font-mono text-[10px] tracking-[0.24em] text-clay-400 uppercase">Orden {orderRef} · rechazada</p>
+            <h2 className="mt-2 font-display text-4xl font-semibold text-cream-100">Su pago fue rechazado</h2>
+            <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-cream-200">
+              El banco no aprobó la transacción. No se realizó ningún cobro. Verifica los datos de tu tarjeta o
+              intenta con otro método de pago: PSE, Baloto y Efecty siempre están disponibles.
+            </p>
+            <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
+              <button
+                onClick={() => setStep("form")}
+                className="btn-press flex items-center justify-center gap-2 rounded-full bg-leaf-600 px-7 py-3 text-sm font-bold text-moss-900 hover:bg-leaf-500"
+              >
+                <ArrowLeftIcon className="h-4 w-4" /> Reintentar con otro método
+              </button>
+              <button
+                onClick={onClose}
+                className="btn-press rounded-full border border-moss-600 px-7 py-3 text-sm font-semibold text-cream-200 hover:border-cream-300/50"
+              >
+                Volver al inicio
+              </button>
+            </div>
           </div>
         )}
       </div>
     </div>
-  );
-}
-
-function LeafGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" className="absolute top-1/2 left-1/2 h-6 w-6 -translate-x-1/2 -translate-y-1/2 text-leaf-400" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M5 19C5 9 11 4 20 4c0 9-5 15-15 15Z" />
-      <path d="M5 19c3-5 6-8 10-10" />
-    </svg>
   );
 }

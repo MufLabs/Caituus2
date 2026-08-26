@@ -207,6 +207,14 @@ export function LockIcon({ className, strokeWidth = 1.7 }: IconProps) {
   );
 }
 
+export function MenuIcon({ className, strokeWidth = 1.9 }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" className={base(className)}>
+      <path d="M4 7h16M4 12h16M4 17h10" />
+    </svg>
+  );
+}
+
 export function WhatsAppIcon({ className, strokeWidth = 1.7 }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" className={base(className)}>
