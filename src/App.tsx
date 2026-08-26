@@ -3,6 +3,7 @@ import AgeGate from "./components/AgeGate";
 import CartDrawer from "./components/CartDrawer";
 import CheckoutModal from "./components/CheckoutModal";
 import CompositionStrip from "./components/CompositionStrip";
+import ErrorBoundary from "./components/ErrorBoundary";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import InfoSections from "./components/InfoSections";
@@ -145,8 +146,10 @@ function AppContent() {
 
 export default function App() {
   return (
-    <ShopProvider>
-      <AppContent />
-    </ShopProvider>
+    <ErrorBoundary>
+      <ShopProvider>
+        <AppContent />
+      </ShopProvider>
+    </ErrorBoundary>
   );
 }
