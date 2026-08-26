@@ -1,0 +1,28 @@
+<svg viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Carita de gato sana y alerta">
+  <defs>
+    <radialGradient id="f" cx=".5" cy=".3" r="1"><stop offset="0" stop-color="#1e2d20"/><stop offset="1" stop-color="#0f1810"/></radialGradient>
+  </defs>
+  <rect width="480" height="360" fill="url(#f)"/>
+  <!-- orejas -->
+  <polygon points="150,120 176,32 240,92" fill="#8d8670"/>
+  <polygon points="330,120 304,32 240,92" fill="#8d8670"/>
+  <polygon points="166,110 180,56 220,92" fill="#c08a6d"/>
+  <polygon points="314,110 300,56 260,92" fill="#c08a6d"/>
+  <!-- cabeza -->
+  <ellipse cx="240" cy="196" rx="112" ry="100" fill="#8d8670"/>
+  <path d="M188 196c0 44 22 74 52 74s52 -30 52 -74" fill="#ded7bf" opacity=".55"/>
+  <!-- ojos grandes -->
+  <ellipse cx="196" cy="180" rx="20" ry="22" fill="#cf9032"/><ellipse cx="196" cy="182" rx="7" ry="12" fill="#232920"/><circle cx="201" cy="174" r="4" fill="#f6efdd"/>
+  <ellipse cx="284" cy="180" rx="20" ry="22" fill="#cf9032"/><ellipse cx="284" cy="182" rx="7" ry="12" fill="#232920"/><circle cx="289" cy="174" r="4" fill="#f6efdd"/>
+  <!-- nariz y boca -->
+  <path d="M234 216l6 7l6 -7z" fill="#c08a6d"/>
+  <path d="M240 223c0 8 -8 12 -14 10M240 223c0 8 8 12 14 10" stroke="#4b5344" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <!-- bigotes -->
+  <g stroke="#ded7bf" stroke-width="2.5" stroke-linecap="round" opacity=".85">
+    <path d="M186 220l-64 -8M188 232l-62 4M186 244l-58 14"/>
+    <path d="M294 220l64 -8M292 232l62 4M294 244l58 14"/>
+  </g>
+  <!-- manchitas -->
+  <circle cx="160" cy="140" r="10" fill="#6e7563"/>
+  <circle cx="320" cy="140" r="10" fill="#6e7563"/>
+</svg>

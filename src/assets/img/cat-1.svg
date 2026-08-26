@@ -1,0 +1,28 @@
+<svg viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Gata tranquila con aceite CBD">
+  <defs>
+    <radialGradient id="f" cx=".5" cy=".3" r="1"><stop offset="0" stop-color="#1e2d20"/><stop offset="1" stop-color="#0f1810"/></radialGradient>
+  </defs>
+  <rect width="480" height="360" fill="url(#f)"/>
+  <ellipse cx="230" cy="306" rx="130" ry="14" fill="#000" opacity=".3"/>
+  <!-- cola -->
+  <path d="M310 288c56 -6 74 -44 62 -84" stroke="#3d4a3a" stroke-width="20" fill="none" stroke-linecap="round"/>
+  <!-- cuerpo sentado -->
+  <path d="M150 300c0 -92 36 -150 84 -150s86 58 86 150z" fill="#4b5344"/>
+  <path d="M186 300c4 -66 20 -104 48 -104s44 38 48 104z" fill="#ded7bf"/>
+  <!-- cabeza -->
+  <circle cx="234" cy="128" r="52" fill="#4b5344"/>
+  <polygon points="196,92 208,52 232,80" fill="#4b5344"/>
+  <polygon points="272,92 260,52 236,80" fill="#4b5344"/>
+  <polygon points="204,86 210,62 224,80" fill="#c08a6d"/>
+  <polygon points="264,86 258,62 244,80" fill="#c08a6d"/>
+  <!-- ojos ámbar -->
+  <ellipse cx="216" cy="126" rx="9" ry="10" fill="#cf9032"/><circle cx="216" cy="127" r="4" fill="#232920"/>
+  <ellipse cx="252" cy="126" rx="9" ry="10" fill="#cf9032"/><circle cx="252" cy="127" r="4" fill="#232920"/>
+  <path d="M230 142l4 5l4 -5" stroke="#c08a6d" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <g stroke="#ded7bf" stroke-width="2" stroke-linecap="round" opacity=".8">
+    <path d="M196 138h-24M198 146l-22 6M272 138h24M270 146l22 6"/>
+  </g>
+  <!-- patitas -->
+  <ellipse cx="210" cy="298" rx="16" ry="9" fill="#ded7bf"/>
+  <ellipse cx="258" cy="298" rx="16" ry="9" fill="#ded7bf"/>
+</svg>
