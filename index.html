@@ -24,47 +24,182 @@
         height: 100%;
         background-color: #f1eee3;
       }
+      #boot-fallback {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: #f1eee3;
+        font-family: "Raleway", "Trebuchet MS", sans-serif;
+        color: #2b322a;
+        box-sizing: border-box;
+      }
+      #boot-card {
+        max-width: 620px;
+        width: 100%;
+        text-align: center;
+        background: #f8f6ec;
+        border: 1px solid #d9d3be;
+        border-radius: 14px;
+        padding: 36px 30px;
+        box-shadow: 0 24px 60px -30px rgba(43, 50, 42, 0.35);
+      }
+      #boot-card h1 {
+        margin: 0 0 10px;
+        font-family: "Lora", Georgia, serif;
+        font-size: 24px;
+        font-weight: 600;
+        color: #2b322a;
+      }
+      #boot-card p {
+        margin: 0;
+        font-size: 13px;
+        line-height: 1.65;
+        color: #6e7563;
+        word-break: break-word;
+      }
+      .boot-leaf {
+        display: inline-block;
+        width: 34px;
+        height: 34px;
+        margin-bottom: 14px;
+        color: #4c7f53;
+        animation: bootpulse 1.6s ease-in-out infinite;
+      }
+      @keyframes bootpulse {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.5;
+          transform: scale(0.88);
+        }
+      }
     </style>
+    <script>
+      /* ------------------------------------------------------------
+         Shim de carga: si la vista previa sirve el sitio desde una
+         subcarpeta, las rutas absolutas /assets/... no resuelven y la
+         app nunca monta. Este shim (JS clásico, sin dependencias)
+         recarga los recursos con rutas relativas cuando eso ocurre.
+         ------------------------------------------------------------ */
+      document.addEventListener("DOMContentLoaded", function () {
+        var root = document.getElementById("root");
+        if (root && root.children.length > 0) return;
+        var shimmed = [];
+        document.querySelectorAll('link[rel="stylesheet"][href^="/"]').forEach(function (l) {
+          var nl = document.createElement("link");
+          nl.rel = "stylesheet";
+          nl.href = "." + l.getAttribute("href");
+          document.head.appendChild(nl);
+          shimmed.push(nl.href);
+        });
+        document.querySelectorAll('script[type="module"][src^="/"]').forEach(function (s) {
+          var ns = document.createElement("script");
+          ns.type = "module";
+          ns.src = "." + s.getAttribute("src");
+          document.body.appendChild(ns);
+          shimmed.push(ns.src);
+        });
+        window.__caituusShim = shimmed;
+      });
+    </script>
+    <script type="module">
+      /* Diagnóstico de arranque: reporta errores y el estado HTTP de cada recurso */
+      const fallback = document.getElementById("boot-fallback");
+      const msgs = [];
+      const showCard = (title, detail) => {
+        if (!fallback) return;
+        fallback.hidden = false;
+        const card = fallback.querySelector("#boot-card");
+        if (card) {
+          card.innerHTML =
+            '<svg class="boot-leaf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M7.2 4.6c4.4-2.6 9.6-1 11.8 3s.4 9.4-4 12-9.6 1-11.8-3-.4-9.4 4-12Z"/><path d="M8.4 5.4c2.4 1.8 2 4.6 3.9 6.8s4.8 2.6 5.2 5.8"/></svg>' +
+            "<h1>" + title + "</h1><p>" + detail + "</p>";
+        }
+      };
+
+      window.addEventListener(
+        "error",
+        (e) => {
+          const t = e.target;
+          if (t && t.tagName === "SCRIPT" && t.src) msgs.push("No se pudo cargar el script: " + t.src);
+          else if (t && t.tagName === "LINK" && t.href) msgs.push("No se pudo cargar el estilo: " + t.href);
+          else msgs.push("Error en la página: " + (e.message || "desconocido"));
+          showCard(
+            "La página no pudo cargar",
+            msgs.join("<br><br>") +
+              "<br><br>Haz una recarga forzada (Ctrl + Shift + R). Si persiste, copia y pega este mensaje."
+          );
+        },
+        true
+      );
+      window.addEventListener("unhandledrejection", (e) => {
+        msgs.push(
+          "Proceso fallido: " + (e.reason && e.reason.message ? e.reason.message : String(e.reason))
+        );
+        showCard("La página no pudo cargar", msgs.join("<br><br>"));
+      });
+
+      const poll = setInterval(() => {
+        const root = document.getElementById("root");
+        if (root && root.children.length > 0) {
+          clearInterval(poll);
+          clearTimeout(boot);
+          if (fallback) fallback.remove();
+        }
+      }, 200);
+
+      const boot = setTimeout(async () => {
+        clearInterval(poll);
+        const report = [];
+        const probe = async (url, kind) => {
+          try {
+            const r = await fetch(url, { method: "GET" });
+            report.push(kind + " " + url + " → HTTP " + r.status);
+          } catch {
+            report.push(kind + " " + url + " → fallo de red o CORS");
+          }
+        };
+        for (const s of document.querySelectorAll('script[type="module"][src]')) {
+          if (!s.src.startsWith("data:")) await probe(s.src, "JS");
+        }
+        for (const l of document.querySelectorAll('link[rel="stylesheet"][href]')) {
+          if (!l.href.includes("fonts.g")) await probe(l.href, "CSS");
+        }
+        showCard(
+          "Diagnóstico Caituus",
+          (msgs.length ? msgs.join("<br><br>") + "<br><br>" : "") +
+            "La aplicación no se montó después de 9 segundos.<br><br>" +
+            "Estado de los recursos:<br>" +
+            (report.join("<br>") || "No se detectaron recursos externos") +
+            (window.__caituusShim && window.__caituusShim.length
+              ? "<br><br>(Se intentó recarga con rutas relativas: " +
+                window.__caituusShim.length +
+                " recursos)"
+              : "") +
+            "<br><br>Haz una recarga forzada (Ctrl + Shift + R). Si persiste, copia y pega TODO este mensaje."
+        );
+      }, 9000);
+    </script>
   </head>
   <body>
-    <div id="root">
-      <div id="boot-splash" style="position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#f1eee3;font-family:Georgia,serif">
-        <div style="width:44px;height:44px;border-radius:50%;border:4px solid #d9d3be;border-top-color:#5d9463;animation:bootspin 0.9s linear infinite"></div>
-        <p style="margin:0;color:#4b5344;font-size:15px;letter-spacing:0.08em">Cargando Caituus…</p>
-        <style>@keyframes bootspin{to{transform:rotate(360deg)}}</style>
+    <div id="root"></div>
+    <div id="boot-fallback" role="status" aria-live="polite">
+      <div id="boot-card">
+        <svg class="boot-leaf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <path d="M7.2 4.6c4.4-2.6 9.6-1 11.8 3s.4 9.4-4 12-9.6 1-11.8-3-.4-9.4 4-12Z" />
+          <path d="M8.4 5.4c2.4 1.8 2 4.6 3.9 6.8s4.8 2.6 5.2 5.8" />
+        </svg>
+        <h1>Cargando Caituus…</h1>
+        <p>Preparando la tienda de productos esenciales de cannabis.</p>
       </div>
     </div>
-    <script>
-      window.__showBootError = function (msg) {
-        var splash = document.getElementById("boot-splash");
-        if (!splash || splash.dataset.failed) return;
-        splash.dataset.failed = "1";
-        splash.innerHTML =
-          '<div style="max-width:560px;margin:0 24px;padding:28px;border:1px solid #c66245;border-radius:10px;background:#f8f6ec;font-family:system-ui,sans-serif">' +
-          '<p style="margin:0 0 8px;font-family:Georgia,serif;font-size:22px;color:#2b322a">La página no pudo cargar</p>' +
-          '<p style="margin:0 0 14px;font-size:14px;color:#4b5344">Ocurrió un error al iniciar. Recarga con Ctrl + Shift + R. Si persiste, copia y comparte este mensaje:</p>' +
-          '<code style="display:block;max-height:160px;overflow:auto;padding:12px;border-radius:8px;background:#f1eee3;border:1px solid #d9d3be;font-size:12px;color:#a94f35;white-space:pre-wrap;word-break:break-word">' +
-          String(msg).replace(/</g, "&lt;") +
-          "</code>" +
-          '<button onclick="location.reload()" style="margin-top:16px;padding:10px 22px;border:none;border-radius:999px;background:#37563c;color:#f1eee3;font-size:14px;font-weight:700;cursor:pointer">Reintentar</button>' +
-          "</div>";
-      };
-      window.addEventListener("error", function (e) {
-        window.__showBootError(e.message + "\n" + (e.filename || "") + ":" + (e.lineno || ""));
-      });
-      window.addEventListener("unhandledrejection", function (e) {
-        window.__showBootError("Promesa rechazada: " + (e.reason && e.reason.message ? e.reason.message : e.reason));
-      });
-      setTimeout(function () {
-        var root = document.getElementById("root");
-        var splash = document.getElementById("boot-splash");
-        if (root && root.children.length <= 1 && splash && !splash.dataset.failed) {
-          window.__showBootError(
-            "La aplicación no se montó después de 8 segundos. Posibles causas: la vista previa necesita recarga forzada (Ctrl + Shift + R) o un recurso no cargó."
-          );
-        }
-      }, 8000);
-    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
