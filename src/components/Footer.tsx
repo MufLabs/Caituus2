@@ -94,25 +94,22 @@ export default function Footer({ onOpenProduct, onCategory }: FooterProps) {
               </button>
             </form>
 
-            <div className="mt-7 flex items-center gap-3">
-              {SOCIALS.map((s, i) => {
-                const Icon = SOCIAL_ICONS[i];
-                return (
-                  <a
-                    key={s.label}
-                    href={s.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    title={`${s.label} · ${s.handle}`}
-                    className="btn-press grid h-11 w-11 place-items-center rounded-full border border-moss-600 text-cream-200 transition-colors hover:border-leaf-500 hover:text-leaf-300"
-                  >
-                    <Icon className="h-5 w-5" />
-                  </a>
-                );
-              })}
-              <div className="ml-2 font-mono text-[10px] leading-relaxed tracking-[0.14em] text-cream-300 uppercase">
-                <p>@caituus · Instagram / X</p>
-                <p>Caituus Indica · Facebook</p>
+            <div className="mt-7">
+              <p className="font-mono text-[10px] tracking-[0.22em] text-cream-300 uppercase">Síguenos</p>
+              <div className="mt-3 flex flex-wrap items-center gap-2.5">
+                {SOCIALS.map((s, i) => {
+                  const Icon = SOCIAL_ICONS[i];
+                  return (
+                    <span
+                      key={s.label}
+                      className="flex items-center gap-2 rounded-full border border-moss-600 bg-moss-850 px-3.5 py-2 text-[12px] font-semibold text-cream-200"
+                    >
+                      <Icon className="h-4 w-4 text-leaf-400" />
+                      {s.handle}
+                      <span className="font-mono text-[9px] tracking-[0.14em] text-cream-300 uppercase">{s.label}</span>
+                    </span>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -188,7 +185,7 @@ export default function Footer({ onOpenProduct, onCategory }: FooterProps) {
             </span>
           </span>
           <span className="font-mono text-[10px] tracking-[0.16em] text-cream-300 uppercase">
-            Website by Mauricio Uribe 2024 — All Rights Reserved
+            © 2026 Caituus — Todos los derechos reservados
           </span>
           <span className="flex items-center gap-2 font-mono text-[10px] tracking-[0.16em] text-cream-300 uppercase">
             <LeafIcon className="h-3.5 w-3.5 text-leaf-400" /> Bogotá · Colombia

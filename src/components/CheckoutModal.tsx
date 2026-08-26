@@ -1,21 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  PAYMENT_METHODS,
-  PAYU_LOGO,
-  PRODUCTS,
-  PSE_BANKS,
-  PURCHASE_TERMS,
-  money,
-} from "../data/products";
+import { PAYMENT_METHODS, PRODUCTS, PURCHASE_TERMS, money } from "../data/products";
 import { useShop } from "../state/shop";
-import { ArrowLeftIcon, CheckIcon, ChevronDownIcon, LockIcon, TruckIcon, XIcon } from "./icons";
+import { ArrowLeftIcon, CheckIcon, LockIcon, TruckIcon, XIcon } from "./icons";
 
 interface CheckoutModalProps {
   open: boolean;
   onClose: () => void;
 }
 
-type Step = "form" | "processing" | "success" | "pending" | "rejected";
+type Step = "form" | "processing" | "success";
 
 interface FormState {
   name: string;
@@ -23,10 +16,7 @@ interface FormState {
   phone: string;
   address: string;
   city: string;
-  cardNumber: string;
-  expiry: string;
-  cvc: string;
-  bank: string;
+  appNumber: string;
 }
 
 const initialForm: FormState = {
@@ -35,10 +25,7 @@ const initialForm: FormState = {
   phone: "",
   address: "",
   city: "",
-  cardNumber: "",
-  expiry: "",
-  cvc: "",
-  bank: "",
+  appNumber: "",
 };
 
 const CONFETTI_COLORS = ["#5d9463", "#cf9032", "#3f7189", "#c05f41", "#f8f6ec", "#37563c"];
@@ -77,13 +64,12 @@ function Confetti() {
 }
 
 export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
-  const { lines, subtotal, shipping, total, clearCart, count } = useShop();
+  const { lines, total, clearCart, count } = useShop();
   const [step, setStep] = useState<Step>("form");
-  const [method, setMethod] = useState("card");
+  const [method, setMethod] = useState("nequi");
   const [form, setForm] = useState<FormState>(initialForm);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [orderRef, setOrderRef] = useState("");
-  const [cashRef, setCashRef] = useState("");
   const [paidTotal, setPaidTotal] = useState(0);
   const timer = useRef<number | null>(null);
 
@@ -92,7 +78,6 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
       setStep("form");
       setErrors({});
       setOrderRef("");
-      setCashRef("");
     }
   }, [open]);
 
@@ -121,9 +106,6 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
   if (!open) return null;
 
   const methodMeta = PAYMENT_METHODS.find((m) => m.id === method)!;
-  const isCard = methodMeta.kind === "card";
-  const isPse = methodMeta.kind === "pse";
-  const isCash = methodMeta.kind === "cash";
 
   const set = (k: keyof FormState, v: string) => {
     setForm((f) => ({ ...f, [k]: v }));
@@ -137,12 +119,8 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
     if (form.phone.replace(/\D/g, "").length < 7) e.phone = "Teléfono inválido";
     if (form.address.trim().length < 5) e.address = "Escribe tu dirección de entrega";
     if (form.city.trim().length < 2) e.city = "Escribe tu ciudad";
-    if (isCard) {
-      if (form.cardNumber.replace(/\s/g, "").length !== 16) e.cardNumber = "Número de 16 dígitos";
-      if (!/^\d{2}\/\d{2}$/.test(form.expiry)) e.expiry = "MM/AA";
-      if (form.cvc.length < 3) e.cvc = "CVC";
-    }
-    if (isPse && !form.bank) e.bank = "Selecciona tu banco";
+    const digits = form.appNumber.replace(/\D/g, "");
+    if (digits.length < 7 || digits.length > 12) e.appNumber = "Escribe un número válido (7–12 dígitos)";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -151,32 +129,14 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
     if (!validate()) return;
     setPaidTotal(total);
     setStep("processing");
-    const ref = `CT-${Math.floor(100000 + Math.random() * 900000)}`;
-    setOrderRef(ref);
-    if (isCash) setCashRef(String(Math.floor(1000000000 + Math.random() * 9000000000)));
-
-    timer.current = window.setTimeout(() => {
-      if (isCash) {
-        setStep("pending"); // Baloto / Efecty: pago pendiente hasta confirmar en efectivo
-      } else if (isCard && form.cardNumber.replace(/\s/g, "").startsWith("0000")) {
-        setStep("rejected"); // Tarjeta de prueba rechazada
-      } else {
-        setStep("success");
-      }
-    }, 1800);
-  };
-
-  const fmtCard = (v: string) =>
-    v.replace(/\D/g, "").slice(0, 16).replace(/(\d{4})(?=\d)/g, "$1 ");
-  const fmtExpiry = (v: string) => {
-    const d = v.replace(/\D/g, "").slice(0, 4);
-    return d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d;
+    setOrderRef(`CT-${Math.floor(100000 + Math.random() * 900000)}`);
+    timer.current = window.setTimeout(() => setStep("success"), 2000);
   };
 
   const inputCls = (k: string) => `field ${errors[k] ? "field-invalid" : ""}`;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-6" role="dialog" aria-modal="true" aria-label="Pago seguro">
+    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-6" role="dialog" aria-modal="true" aria-label="Pago">
       <button
         className="absolute inset-0 animate-fade cursor-default bg-moss-950/70 backdrop-blur-[2px]"
         onClick={() => step !== "processing" && onClose()}
@@ -191,7 +151,7 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
               <div>
                 <h2 className="font-display text-2xl font-semibold text-cream-100">Finalizar compra</h2>
                 <p className="mt-0.5 flex items-center gap-2 font-mono text-[10px] tracking-[0.16em] text-cream-300 uppercase">
-                  <img src={PAYU_LOGO} alt="PayU" className="h-4 brightness-150" /> Pasarela segura
+                  <LockIcon className="h-3.5 w-3.5 text-leaf-400" /> Pago seguro desde tu celular
                 </p>
               </div>
               <button
@@ -205,7 +165,9 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
 
             <div className="px-6 py-5">
               <section className="rounded-lg border border-moss-700 bg-moss-900/60 p-4">
-                <p className="font-mono text-[10px] tracking-[0.22em] text-cream-300 uppercase">Tu pedido · {count} {count === 1 ? "producto" : "productos"}</p>
+                <p className="font-mono text-[10px] tracking-[0.22em] text-cream-300 uppercase">
+                  Tu pedido · {count} {count === 1 ? "producto" : "productos"}
+                </p>
                 <ul className="mt-3 space-y-2">
                   {lines.map((l) => {
                     const p = PRODUCTS.find((x) => x.id === l.productId);
@@ -213,7 +175,7 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
                     return (
                       <li key={l.productId} className="flex items-center justify-between gap-3 text-sm">
                         <span className="flex items-center gap-3">
-                          <img src={p.image} alt="" className="h-10 w-9 rounded border border-moss-700 bg-white object-cover" />
+                          <img src={p.image} alt="" className="h-10 w-9 rounded border border-moss-700 object-cover" />
                           <span className="text-cream-100">
                             {p.name} <span className="font-mono text-xs text-cream-300">× {l.qty}</span>
                           </span>
@@ -225,7 +187,7 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
                 </ul>
                 <div className="mt-3 flex items-center justify-between border-t border-dashed border-moss-700 pt-3 text-sm">
                   <span className="text-cream-300">Envío (contraentrega)</span>
-                  <span className="font-mono text-amber-400">{shipping === 0 ? "Se paga al recibir" : money(shipping)}</span>
+                  <span className="font-mono text-amber-400">Se paga al recibir</span>
                 </div>
                 <div className="mt-2 flex items-center justify-between text-base font-bold text-cream-100">
                   <span>Total a pagar hoy</span>
@@ -264,8 +226,8 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
               </section>
 
               <section className="mt-6">
-                <h3 className="font-mono text-[10px] tracking-[0.22em] text-cream-300 uppercase">2 · Método de pago</h3>
-                <div className="mt-3 grid gap-2.5 sm:grid-cols-2">
+                <h3 className="font-mono text-[10px] tracking-[0.22em] text-cream-300 uppercase">2 · Medio de pago</h3>
+                <div className="mt-3 grid gap-2.5 sm:grid-cols-3">
                   {PAYMENT_METHODS.map((m) => {
                     const active = method === m.id;
                     return (
@@ -273,7 +235,7 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
                         key={m.id}
                         onClick={() => {
                           setMethod(m.id);
-                          setErrors({});
+                          setErrors((e) => ({ ...e, appNumber: "" }));
                         }}
                         aria-pressed={active}
                         className={`btn-press rounded-lg border p-3.5 text-left transition-all ${
@@ -283,16 +245,12 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
                         }`}
                       >
                         <span className="flex items-center justify-between gap-2">
-                          <span className="flex items-center gap-2.5">
-                            {m.logos ? (
-                              <span className="flex gap-1">
-                                {m.logos.map((l) => (
-                                  <img key={l} src={l} alt="" className="h-5 rounded-sm bg-white px-0.5 object-contain" />
-                                ))}
-                              </span>
-                            ) : (
-                              <img src={m.logo} alt="" className="h-6 rounded-sm bg-white px-1 object-contain" />
-                            )}
+                          <span
+                            className="grid h-9 min-w-9 place-items-center rounded-md px-1.5 font-display text-lg font-bold"
+                            style={{ background: m.color, color: "#f8f6ec" }}
+                            aria-hidden="true"
+                          >
+                            {m.label.charAt(0)}
                           </span>
                           <span
                             className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border ${
@@ -309,74 +267,36 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
                   })}
                 </div>
 
-                {isCard && (
-                  <div className="mt-4 grid animate-rise gap-3 sm:grid-cols-2">
-                    <div className="sm:col-span-2">
-                      <input
-                        className={inputCls("cardNumber")}
-                        placeholder="Número de tarjeta *  (0000… para simular rechazo)"
-                        inputMode="numeric"
-                        value={form.cardNumber}
-                        onChange={(e) => set("cardNumber", fmtCard(e.target.value))}
-                      />
-                      {errors.cardNumber && <p className="mt-1 text-xs font-medium text-clay-400">{errors.cardNumber}</p>}
-                    </div>
-                    <div>
-                      <input className={inputCls("expiry")} placeholder="MM/AA *" inputMode="numeric" value={form.expiry} onChange={(e) => set("expiry", fmtExpiry(e.target.value))} />
-                      {errors.expiry && <p className="mt-1 text-xs font-medium text-clay-400">{errors.expiry}</p>}
-                    </div>
-                    <div>
-                      <input className={inputCls("cvc")} placeholder="CVC *" inputMode="numeric" maxLength={4} value={form.cvc} onChange={(e) => set("cvc", e.target.value.replace(/\D/g, ""))} />
-                      {errors.cvc && <p className="mt-1 text-xs font-medium text-clay-400">{errors.cvc}</p>}
-                    </div>
-                  </div>
-                )}
-
-                {isPse && (
-                  <div className="relative mt-4 animate-rise">
-                    <select className={`${inputCls("bank")} cursor-pointer appearance-none pr-9`} value={form.bank} onChange={(e) => set("bank", e.target.value)}>
-                      <option value="">Selecciona tu banco *</option>
-                      {PSE_BANKS.map((b) => (
-                        <option key={b} value={b}>{b}</option>
-                      ))}
-                    </select>
-                    <ChevronDownIcon className="pointer-events-none absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 text-moss-500" />
-                    {errors.bank && <p className="mt-1 text-xs font-medium text-clay-400">{errors.bank}</p>}
-                    <p className="mt-2 text-[11px] text-cream-300">Serás redirigido a tu banco para aprobar el débito. Al volver, confirmaremos tu pedido.</p>
-                  </div>
-                )}
-
-                {isCash && (
-                  <div className="mt-4 animate-rise rounded-md border border-amber-500/50 bg-amber-500/10 p-4">
-                    <p className="text-[13px] font-bold text-cream-100">
-                      {methodMeta.label}: pago en efectivo
-                    </p>
-                    <p className="mt-1 text-[12px] leading-relaxed text-cream-200">
-                      Al confirmar generaremos una <strong>referencia de pago</strong>. Acércate a cualquier punto{" "}
-                      {methodMeta.label} y presenta la referencia. Tu pedido quedará{" "}
-                      <strong>pendiente</strong> hasta que el pago se confirme — te avisaremos por WhatsApp o correo.
-                    </p>
-                  </div>
-                )}
-
-                {methodMeta.kind === "wallet" && (
-                  <div className="mt-4 animate-rise rounded-md border border-moss-600 bg-moss-900/60 p-4">
-                    <p className="text-[12px] leading-relaxed text-cream-200">
-                      Serás redirigido a PayPal para completar el pago de forma segura. Al finalizar, volverás a esta tienda con tu pedido confirmado.
-                    </p>
-                  </div>
-                )}
+                <div key={method} className="mt-4 animate-rise">
+                  <label htmlFor="app-number" className="font-mono text-[10px] tracking-[0.18em] text-cream-300 uppercase">
+                    {methodMeta.field} *
+                  </label>
+                  <input
+                    id="app-number"
+                    className={`${inputCls("appNumber")} mt-1.5`}
+                    placeholder="Ej: 300 123 4567"
+                    inputMode="tel"
+                    value={form.appNumber}
+                    onChange={(e) => set("appNumber", e.target.value.replace(/[^\d\s]/g, ""))}
+                  />
+                  {errors.appNumber && <p className="mt-1 text-xs font-medium text-clay-400">{errors.appNumber}</p>}
+                  <p className="mt-2 text-[11px] leading-relaxed text-cream-300">
+                    {methodMeta.kind === "push"
+                      ? `Al confirmar, recibirás una notificación en ${methodMeta.label} por ${money(total)}. Acéptala en tu app para completar la compra.`
+                      : `Al confirmar, iniciaremos la transferencia inmediata de ${money(total)} desde tu banco a través de Bre-B. Recibirás la confirmación en segundos.`}
+                  </p>
+                </div>
               </section>
 
               <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <p className="flex items-center gap-2 font-mono text-[10px] tracking-[0.14em] text-cream-300 uppercase">
-                  <LockIcon className="h-4 w-4 text-leaf-400" /> Pago cifrado SSL · Procesado por PayU
+                  <LockIcon className="h-4 w-4 text-leaf-400" /> Transacción cifrada de extremo a extremo
                 </p>
                 <button
                   onClick={placeOrder}
                   className="btn-press rounded-md bg-amber-500 px-8 py-3.5 text-sm font-bold text-moss-950 shadow-[0_10px_24px_-12px_rgba(207,144,50,0.7)] hover:bg-amber-400"
                 >
-                  {isCash ? `Generar referencia · ${money(total)}` : `Pagar ${money(total)}`}
+                  Enviar solicitud de pago · {money(total)}
                 </button>
               </div>
               <p className="mt-3 text-center font-mono text-[9px] tracking-[0.12em] text-cream-300 uppercase">
@@ -389,13 +309,15 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
         {step === "processing" && (
           <div className="flex flex-col items-center px-6 py-20 text-center">
             <span className="h-14 w-14 animate-spin rounded-full border-4 border-moss-600 border-t-amber-500" />
-            <h2 className="mt-6 font-display text-2xl font-semibold text-cream-100">Procesando tu pago…</h2>
+            <h2 className="mt-6 font-display text-2xl font-semibold text-cream-100">
+              {methodMeta.kind === "push" ? `Esperando tu aprobación en ${methodMeta.label}…` : "Confirmando tu transferencia Bre-B…"}
+            </h2>
             <p className="mt-2 max-w-sm text-sm text-cream-200">
-              Estamos confirmando la transacción con {methodMeta.label} a través de PayU. No cierres esta ventana.
+              {methodMeta.kind === "push"
+                ? `Enviamos una notificación a tu app ${methodMeta.label}. Apruébala para confirmar el pago de ${money(total)}.`
+                : `Estamos conectando con tu banco para confirmar la transferencia de ${money(total)}. No cierres esta ventana.`}
             </p>
-            <p className="mt-5 font-mono text-[10px] tracking-[0.18em] text-cream-300 uppercase">
-              Orden {orderRef}
-            </p>
+            <p className="mt-5 font-mono text-[10px] tracking-[0.18em] text-cream-300 uppercase">Orden {orderRef}</p>
           </div>
         )}
 
@@ -424,62 +346,6 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
             >
               Volver al inicio
             </button>
-          </div>
-        )}
-
-        {step === "pending" && (
-          <div className="px-6 py-12 text-center sm:px-12">
-            <span className="mx-auto grid h-16 w-16 animate-pop place-items-center rounded-full bg-amber-500/20 text-amber-300">
-              <span className="h-3 w-3 animate-pulse-dot rounded-full bg-amber-400" />
-            </span>
-            <p className="mt-5 font-mono text-[10px] tracking-[0.24em] text-amber-400 uppercase">Orden {orderRef} · pendiente</p>
-            <h2 className="mt-2 font-display text-4xl font-semibold text-cream-100">Tu pago quedó pendiente</h2>
-            <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-cream-200">
-              Presenta esta referencia en cualquier punto <strong>{methodMeta.label}</strong> para completar tu pago.
-              Una vez confirmado, tu producto será llevado a la empresa de mensajería dentro de las próximas 24 horas.
-            </p>
-            <div className="mx-auto mt-6 max-w-xs rounded-lg border border-dashed border-amber-500/60 bg-amber-500/10 px-6 py-4">
-              <p className="font-mono text-[10px] tracking-[0.2em] text-cream-300 uppercase">Referencia de pago</p>
-              <p className="mt-1 font-mono text-2xl font-bold tracking-wider text-cream-100">{cashRef}</p>
-              <p className="mt-1 font-mono text-[11px] text-cream-300">Valor: {money(paidTotal)}</p>
-            </div>
-            <p className="mt-4 text-[12px] text-cream-300">
-              Te enviaremos la confirmación y la guía de transporte a tu WhatsApp o correo.
-            </p>
-            <button
-              onClick={onClose}
-              className="btn-press mt-6 rounded-full bg-amber-500 px-8 py-3 text-sm font-bold text-moss-950 hover:bg-amber-400"
-            >
-              Entendido, volver al inicio
-            </button>
-          </div>
-        )}
-
-        {step === "rejected" && (
-          <div className="px-6 py-12 text-center sm:px-12">
-            <span className="mx-auto grid h-16 w-16 animate-pop place-items-center rounded-full bg-clay-500/20 text-clay-400">
-              <XIcon className="h-8 w-8" />
-            </span>
-            <p className="mt-5 font-mono text-[10px] tracking-[0.24em] text-clay-400 uppercase">Orden {orderRef} · rechazada</p>
-            <h2 className="mt-2 font-display text-4xl font-semibold text-cream-100">Su pago fue rechazado</h2>
-            <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-cream-200">
-              El banco no aprobó la transacción. No se realizó ningún cobro. Verifica los datos de tu tarjeta o
-              intenta con otro método de pago: PSE, Baloto y Efecty siempre están disponibles.
-            </p>
-            <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
-              <button
-                onClick={() => setStep("form")}
-                className="btn-press flex items-center justify-center gap-2 rounded-full bg-leaf-600 px-7 py-3 text-sm font-bold text-moss-900 hover:bg-leaf-500"
-              >
-                <ArrowLeftIcon className="h-4 w-4" /> Reintentar con otro método
-              </button>
-              <button
-                onClick={onClose}
-                className="btn-press rounded-full border border-moss-600 px-7 py-3 text-sm font-semibold text-cream-200 hover:border-cream-300/50"
-              >
-                Volver al inicio
-              </button>
-            </div>
           </div>
         )}
       </div>

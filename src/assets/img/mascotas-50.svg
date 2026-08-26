@@ -1,0 +1,49 @@
+<svg viewBox="0 0 480 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Aceite CBD para mascotas 50 ml">
+  <defs>
+    <linearGradient id="vidrio" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8a5316"/>
+      <stop offset=".45" stop-color="#d29a3f"/>
+      <stop offset=".75" stop-color="#a86a20"/>
+      <stop offset="1" stop-color="#6e4210"/>
+    </linearGradient>
+    <radialGradient id="fondo" cx=".5" cy=".3" r="1">
+      <stop offset="0" stop-color="#1e2a1d"/>
+      <stop offset="1" stop-color="#0f1810"/>
+    </radialGradient>
+    <g id="pata" fill="#37563c">
+      <ellipse cx="0" cy="8" rx="13" ry="10"/>
+      <circle cx="-12" cy="-6" r="5.5"/>
+      <circle cx="-4" cy="-11" r="5.5"/>
+      <circle cx="4" cy="-11" r="5.5"/>
+      <circle cx="12" cy="-6" r="5.5"/>
+    </g>
+  </defs>
+  <rect width="480" height="600" fill="url(#fondo)"/>
+  <ellipse cx="236" cy="486" rx="140" ry="17" fill="#000" opacity=".3"/>
+  <!-- hueso -->
+  <g transform="translate(330 452) rotate(-14)" fill="#e8e0c8">
+    <circle cx="-24" cy="-7" r="9"/><circle cx="-24" cy="7" r="9"/>
+    <circle cx="24" cy="-7" r="9"/><circle cx="24" cy="7" r="9"/>
+    <rect x="-24" y="-7" width="48" height="14" rx="7"/>
+  </g>
+  <!-- frasco -->
+  <rect x="176" y="204" width="132" height="266" rx="19" fill="url(#vidrio)"/>
+  <path d="M176 229c0-27 25-39 66-39s66 12 66 39" fill="url(#vidrio)"/>
+  <rect x="223" y="150" width="38" height="50" fill="#7a4a12"/>
+  <rect x="214" y="110" width="56" height="46" rx="9" fill="#20261b"/>
+  <rect x="214" y="120" width="56" height="4" fill="#333c2c"/>
+  <rect x="230" y="84" width="24" height="30" rx="11" fill="#2c3527"/>
+  <rect x="190" y="222" width="13" height="226" rx="6.5" fill="#fff" opacity=".16"/>
+  <!-- etiqueta -->
+  <rect x="190" y="278" width="104" height="138" rx="6" fill="#f6efdd"/>
+  <text x="242" y="298" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" letter-spacing="2.5" fill="#37563c">CAITUUS</text>
+  <use href="#pata" transform="translate(242 330) scale(1.05)"/>
+  <rect x="190" y="360" width="104" height="26" fill="#cf9032"/>
+  <text x="242" y="378" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" letter-spacing="1" fill="#232920">MASCOTAS</text>
+  <rect x="204" y="393" width="76" height="4.5" rx="2.25" fill="#b9b09a"/>
+  <text x="242" y="410" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#6e7563">50 ml · 0% THC</text>
+  <!-- pelotas -->
+  <circle cx="120" cy="462" r="16" fill="#5d9463"/>
+  <path d="M106 456c10 3 18 3 28 0" stroke="#37563c" stroke-width="2.5" fill="none"/>
+  <circle cx="150" cy="474" r="9" fill="#c05f41"/>
+</svg>

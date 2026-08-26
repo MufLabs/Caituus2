@@ -1,7 +1,21 @@
-/* Datos reales del sitio original de Caituus (repositorio MufLabs/Caituus,
-   extraído de Weebly). Imágenes servidas desde la carpeta /images del repo. */
+/* Línea de productos Caituus — Productos Esenciales de Cannabis.
+   Todas las ilustraciones son locales (src/assets/img) — cero dependencias externas. */
 
-const REPO_IMG = "https://raw.githubusercontent.com/MufLabs/Caituus/main/images";
+import aceite25 from "../assets/img/aceite-25.svg";
+import aceite50 from "../assets/img/aceite-50.svg";
+import aceite100 from "../assets/img/aceite-100.svg";
+import mascotas50 from "../assets/img/mascotas-50.svg";
+import extractoThc from "../assets/img/extracto-thc.svg";
+import extractoJeringa from "../assets/img/extracto-jeringa.svg";
+import imgLineup from "../assets/img/lineup.svg";
+import imgLab from "../assets/img/lab.svg";
+import imgBottle from "../assets/img/bottle-detail.svg";
+import imgBoxes from "../assets/img/boxes.svg";
+import imgLeaves from "../assets/img/leaves.svg";
+import imgCat1 from "../assets/img/cat-1.svg";
+import imgCat2 from "../assets/img/cat-2.svg";
+import imgCat3 from "../assets/img/cat-3.svg";
+import imgCatDosing from "../assets/img/cat-dosing.svg";
 
 export const money = (n: number) =>
   "$" + Math.round(n).toLocaleString("es-CO", { maximumFractionDigits: 0 });
@@ -29,8 +43,8 @@ export interface Product {
   compareAt?: number;
   category: Category;
   image: string;
-  content: string; // contenido del frasco
-  kind: string; // tipo de extracto
+  content: string;
+  kind: string;
   thc: string;
   use: { aplicacion: string; dosis: string; momento: string };
   specs: { label: string; value: string }[];
@@ -51,7 +65,7 @@ export const PRODUCTS: Product[] = [
       "Aceite esencial de CBD de espectro completo en frasco gotero de 25 ml. Elaborado con hemp orgánico cultivado en Colombia y extraído por CO₂ supercrítico, sin solventes ni aditivos. Ideal para comenzar tu rutina de bienestar.",
     price: 95000,
     category: "aceites",
-    image: `${REPO_IMG}/cajas-25-gotas-2.png`,
+    image: aceite25,
     content: "25 ml · frasco gotero",
     kind: "Espectro completo",
     thc: "THC < 0.3%",
@@ -84,7 +98,7 @@ export const PRODUCTS: Product[] = [
     price: 160000,
     compareAt: 190000,
     category: "aceites",
-    image: `${REPO_IMG}/caja-y-botella-50-ml-nueva.jpg`,
+    image: aceite50,
     content: "50 ml · caja + frasco gotero",
     kind: "Espectro completo",
     thc: "THC < 0.3%",
@@ -116,7 +130,7 @@ export const PRODUCTS: Product[] = [
       "Nuestro frasco de mayor capacidad: 100 ml de aceite esencial de CBD de espectro completo. Pensado para usuarios frecuentes y familias que ya conocen su dosis y quieren el mejor valor por gota.",
     price: 260000,
     category: "aceites",
-    image: `${REPO_IMG}/100-ml-nuevo.jpg`,
+    image: aceite100,
     content: "100 ml · frasco gotero familiar",
     kind: "Espectro completo",
     thc: "THC < 0.3%",
@@ -148,7 +162,7 @@ export const PRODUCTS: Product[] = [
       "Aceite de CBD formulado especialmente para perros y gatos, con 0% THC y saborizante natural que facilita la toma. Acompaña la ansiedad por ruidos o separación, el descanso y la movilidad de tu peludo.",
     price: 150000,
     category: "mascotas",
-    image: `${REPO_IMG}/doble-perrito-50ml.jpg`,
+    image: mascotas50,
     content: "50 ml · gotero con jeringa dosificadora",
     kind: "Amplio espectro · 0% THC",
     thc: "0% THC — seguro para mascotas",
@@ -180,7 +194,7 @@ export const PRODUCTS: Product[] = [
       "Extracto de cannabis con THC en presentación de 20 ml, elaborado para usuarios adultos que buscan una fórmula de alta concentración. Venta exclusiva para mayores de edad conforme a la Ley 1787 de 2016.",
     price: 180000,
     category: "extractos",
-    image: `${REPO_IMG}/extract_orig.jpg`,
+    image: extractoThc,
     content: "20 ml · frasco ámbar gotero",
     kind: "Extracto con THC",
     thc: "Solo mayores de 18 años",
@@ -212,7 +226,7 @@ export const PRODUCTS: Product[] = [
       "Extracto puro de cannabis en jeringa dosificadora de 5 ml, disponible en variedades Indica y Sativa. La presentación preferida de usuarios experimentados: precisa, portátil y de máxima pureza.",
     price: 120000,
     category: "extractos",
-    image: `${REPO_IMG}/jeringasindica600px-orig_orig.png`,
+    image: extractoJeringa,
     content: "5 ml · jeringa dosificadora",
     kind: "Indica / Sativa",
     thc: "Solo mayores de 18 años",
@@ -239,81 +253,47 @@ export const PRODUCTS: Product[] = [
 ];
 
 /* ------------------------------------------------------------------ */
-/* Pagos — el sitio original usaba la pasarela PayU con estos métodos,
-   según los logos de images/logos del repositorio.                    */
+/* Medios de pago — únicamente Nequi, Daviplata y Breve (Bre-B).       */
 /* ------------------------------------------------------------------ */
 
 export interface PaymentMethod {
   id: string;
   label: string;
   hint: string;
-  logo: string;
-  logos?: string[];
-  kind: "card" | "pse" | "cash" | "wallet";
+  field: string; // etiqueta del campo de la app
+  color: string;
+  kind: "push" | "transfer";
 }
-
-export const PAYU_LOGO = `${REPO_IMG}/logos/payu-2x1-orig_orig.png`;
 
 export const PAYMENT_METHODS: PaymentMethod[] = [
   {
-    id: "card",
-    label: "Tarjeta de crédito o débito",
-    hint: "Visa · Mastercard · American Express · Diners Club",
-    logo: `${REPO_IMG}/logos/visa-150px-2-orig_orig.png`,
-    logos: [
-      `${REPO_IMG}/logos/visa-150px-2-orig_orig.png`,
-      `${REPO_IMG}/logos/master-48pxheight-orig_orig.png`,
-      `${REPO_IMG}/logos/american-express-orig_orig.png`,
-      `${REPO_IMG}/logos/dinersclub-48pxheight-orig_orig.png`,
-    ],
-    kind: "card",
+    id: "nequi",
+    label: "Nequi",
+    hint: "Te enviaremos una notificación a tu app Nequi para que apruebes el pago.",
+    field: "Número de Nequi (celular)",
+    color: "#8d4fc4",
+    kind: "push",
   },
   {
-    id: "pse",
-    label: "PSE — débito bancario",
-    hint: "Pagas desde tu banco en línea, al instante",
-    logo: `${REPO_IMG}/logos/pse-orig_orig.png`,
-    kind: "pse",
+    id: "daviplata",
+    label: "Daviplata",
+    hint: "Recibirás un mensaje de pago en tu app Daviplata para confirmarlo.",
+    field: "Número de Daviplata (celular)",
+    color: "#e03a2f",
+    kind: "push",
   },
   {
-    id: "baloto",
-    label: "Baloto",
-    hint: "Pagas en efectivo con tu referencia — el pedido queda pendiente hasta confirmar",
-    logo: `${REPO_IMG}/logos/baloto-orig_orig.png`,
-    kind: "cash",
+    id: "breve",
+    label: "Breve (Bre-B)",
+    hint: "Transferencia inmediata desde tu banco con tu llave Bre-B.",
+    field: "Celular o llave Bre-B",
+    color: "#0e8f76",
+    kind: "transfer",
   },
-  {
-    id: "efecty",
-    label: "Efecty",
-    hint: "Pagas en efectivo en cualquier punto Efecty con tu referencia",
-    logo: `${REPO_IMG}/logos/efe-orig_orig.png`,
-    kind: "cash",
-  },
-  {
-    id: "paypal",
-    label: "PayPal",
-    hint: "Para pagos internacionales",
-    logo: `${REPO_IMG}/logos/paypal-206x102-orig_orig.png`,
-    kind: "wallet",
-  },
-];
-
-export const PSE_BANKS = [
-  "Bancolombia",
-  "Banco de Bogotá",
-  "Davivienda",
-  "BBVA Colombia",
-  "Banco de Occidente",
-  "Banco Popular",
-  "Banco AV Villas",
-  "Itaú",
-  "Banco Caja Social",
-  "Nequi (vía PSE)",
-  "Daviplata (vía PSE)",
 ];
 
 /* ------------------------------------------------------------------ */
-/* Condiciones del sitio original (páginas exitoso/negado/pendiente)   */
+/* Condiciones de compra                                               */
 /* ------------------------------------------------------------------ */
 
 export const PURCHASE_TERMS = [
@@ -339,25 +319,22 @@ export const LEGAL = {
 };
 
 export const SOCIALS = [
-  { label: "Instagram", handle: "@caituus", url: "https://instagram.com/caituus" },
-  { label: "Facebook", handle: "Caituus Indica", url: "https://facebook.com/CaituusIndica" },
-  { label: "X (Twitter)", handle: "@caituus", url: "https://x.com/caituus" },
+  { label: "Instagram", handle: "@caituus" },
+  { label: "Facebook", handle: "Caituus Indica" },
+  { label: "X (Twitter)", handle: "@caituus" },
 ];
 
-/* Imágenes del repositorio usadas en las secciones */
+/* Ilustraciones locales usadas en las secciones */
 export const SECTION_IMAGES = {
-  lineup: `${REPO_IMG}/todas-las-cajas-fondo-blanco.png`,
-  boxesDark: `${REPO_IMG}/cajas-cbd-fondo.png`,
-  lab: `${REPO_IMG}/6-laboratory-test-tubes-orig_orig.png`,
-  blackBottle: `${REPO_IMG}/frasco-aceite-negro-solo8x6-orig_orig.png`,
-  dosingCat: `${REPO_IMG}/dosing-cat-mod-orig_orig.jpg`,
-  cat4: `${REPO_IMG}/gatica4_orig.jpg`,
-  cat5: `${REPO_IMG}/gatica5_orig.jpg`,
-  cat6: `${REPO_IMG}/gatica6_orig.jpg`,
-  petOil2019: `${REPO_IMG}/aceite-mascotas-2019.jpg`,
-  sativaIndica: `${REPO_IMG}/sativa-indica.jpg`,
-  jeringaSativa: `${REPO_IMG}/jeringasativa600px-orig_orig.png`,
-  siteBackground: `${REPO_IMG}/background-images/1366250879.jpg`,
+  lineup: imgLineup,
+  lab: imgLab,
+  blackBottle: imgBottle,
+  boxesDark: imgBoxes,
+  sativaIndica: imgLeaves,
+  cat4: imgCat1,
+  cat5: imgCat2,
+  cat6: imgCat3,
+  dosingCat: imgCatDosing,
 };
 
 export const intensityOf = (mg: number) => (mg <= 500 ? 1 : mg <= 1000 ? 2 : 3);

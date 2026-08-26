@@ -36,7 +36,7 @@ export default function Header() {
                 <span>Certificado de laboratorio por lote</span>
                 <span>THC &lt; 0.3% en línea humana</span>
                 <span>Hecho en Bogotá · Hemp orgánico</span>
-                <span>Paga con PSE · Baloto · Efecty · Tarjetas</span>
+                <span>Paga con Nequi · Daviplata · Breve (Bre-B)</span>
               </div>
             ))}
           </div>

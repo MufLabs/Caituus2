@@ -16,7 +16,7 @@ import {
 
 const STEPS = [
   { title: "Elige tu producto", copy: "Aceites de 25, 50 y 100 ml, extractos y la línea mascotas.", icon: LeafIcon },
-  { title: "Paga con PayU", copy: "Tarjeta, PSE, Baloto, Efecty o PayPal — tú eliges.", icon: WalletIcon },
+  { title: "Paga desde tu celular", copy: "Nequi, Daviplata o Breve (Bre-B) — tú eliges.", icon: WalletIcon },
   { title: "Despacho en 24 h", copy: "Llevamos tu pedido a la transportadora al día siguiente.", icon: TruckIcon },
   { title: "Recibe y paga el envío", copy: "El envío se paga contraentrega. Guía por WhatsApp o correo.", icon: WhatsAppIcon },
 ];
@@ -245,7 +245,7 @@ export default function InfoSections({ onBrowseMascotas }: InfoSectionsProps) {
               </div>
               <p className="flex max-w-xs items-center gap-2 font-mono text-[11px] leading-relaxed tracking-[0.06em] text-cream-300 uppercase">
                 <BankIcon className="h-4 w-4 shrink-0 text-amber-400" />
-                Pasarela PayU: tarjetas, PSE, Baloto, Efecty y PayPal
+                Pagos: Nequi · Daviplata · Breve (Bre-B)
               </p>
             </div>
           </Reveal>

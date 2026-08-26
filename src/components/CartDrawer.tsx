@@ -178,10 +178,10 @@ export default function CartDrawer({ onCheckout }: CartDrawerProps) {
               onClick={onCheckout}
               className="btn-press mt-4 flex w-full items-center justify-center gap-2 rounded-md bg-amber-500 py-3.5 text-sm font-bold text-moss-950 hover:bg-amber-400"
             >
-              Ir a pagar con PayU · {money(total)} <ArrowRightIcon className="h-4 w-4" />
+              Ir a pagar · {money(total)} <ArrowRightIcon className="h-4 w-4" />
             </button>
             <p className="mt-2.5 flex items-center justify-center gap-1.5 text-center font-mono text-[10px] tracking-[0.1em] text-cream-300 uppercase">
-              <CheckIcon className="h-3 w-3 text-leaf-400" /> PSE · Baloto · Efecty · Tarjetas · PayPal
+              <CheckIcon className="h-3 w-3 text-leaf-400" /> Nequi · Daviplata · Breve (Bre-B)
             </p>
           </footer>
         )}
