@@ -22,184 +22,184 @@
         padding: 0;
         width: 100%;
         height: 100%;
-        background-color: #f1eee3;
+        background-color: #0e140d;
       }
-      #boot-fallback {
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <noscript>
+      <p style="color: #f1ecdc; font-family: sans-serif; padding: 2rem">
+        Caituus requiere JavaScript para funcionar.
+      </p>
+    </noscript>
+
+    <div
+      id="app-loader"
+      style="
         position: fixed;
         inset: 0;
         z-index: 9999;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 24px;
-        background: #f1eee3;
-        font-family: "Raleway", "Trebuchet MS", sans-serif;
-        color: #2b322a;
-        box-sizing: border-box;
-      }
-      #boot-card {
-        max-width: 620px;
-        width: 100%;
+        gap: 18px;
+        background: #0e140d;
+        color: #f1ecdc;
+        font-family: 'Raleway', sans-serif;
         text-align: center;
-        background: #f8f6ec;
-        border: 1px solid #d9d3be;
-        border-radius: 14px;
-        padding: 36px 30px;
-        box-shadow: 0 24px 60px -30px rgba(43, 50, 42, 0.35);
-      }
-      #boot-card h1 {
-        margin: 0 0 10px;
-        font-family: "Lora", Georgia, serif;
-        font-size: 24px;
-        font-weight: 600;
-        color: #2b322a;
-      }
-      #boot-card p {
-        margin: 0;
-        font-size: 13px;
-        line-height: 1.65;
-        color: #6e7563;
-        word-break: break-word;
-      }
-      .boot-leaf {
-        display: inline-block;
-        width: 34px;
-        height: 34px;
-        margin-bottom: 14px;
-        color: #4c7f53;
-        animation: bootpulse 1.6s ease-in-out infinite;
-      }
-      @keyframes bootpulse {
-        0%,
-        100% {
-          opacity: 1;
-          transform: scale(1);
-        }
-        50% {
-          opacity: 0.5;
-          transform: scale(0.88);
-        }
-      }
-    </style>
-    <script>
-      /* ------------------------------------------------------------
-         Shim de carga: si la vista previa sirve el sitio desde una
-         subcarpeta, las rutas absolutas /assets/... no resuelven y la
-         app nunca monta. Este shim (JS clásico, sin dependencias)
-         recarga los recursos con rutas relativas cuando eso ocurre.
-         ------------------------------------------------------------ */
-      document.addEventListener("DOMContentLoaded", function () {
-        var root = document.getElementById("root");
-        if (root && root.children.length > 0) return;
-        var shimmed = [];
-        document.querySelectorAll('link[rel="stylesheet"][href^="/"]').forEach(function (l) {
-          var nl = document.createElement("link");
-          nl.rel = "stylesheet";
-          nl.href = "." + l.getAttribute("href");
-          document.head.appendChild(nl);
-          shimmed.push(nl.href);
-        });
-        document.querySelectorAll('script[type="module"][src^="/"]').forEach(function (s) {
-          var ns = document.createElement("script");
-          ns.type = "module";
-          ns.src = "." + s.getAttribute("src");
-          document.body.appendChild(ns);
-          shimmed.push(ns.src);
-        });
-        window.__caituusShim = shimmed;
-      });
-    </script>
-    <script type="module">
-      /* Diagnóstico de arranque: reporta errores y el estado HTTP de cada recurso */
-      const fallback = document.getElementById("boot-fallback");
-      const msgs = [];
-      const showCard = (title, detail) => {
-        if (!fallback) return;
-        fallback.hidden = false;
-        const card = fallback.querySelector("#boot-card");
-        if (card) {
-          card.innerHTML =
-            '<svg class="boot-leaf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M7.2 4.6c4.4-2.6 9.6-1 11.8 3s.4 9.4-4 12-9.6 1-11.8-3-.4-9.4 4-12Z"/><path d="M8.4 5.4c2.4 1.8 2 4.6 3.9 6.8s4.8 2.6 5.2 5.8"/></svg>' +
-            "<h1>" + title + "</h1><p>" + detail + "</p>";
-        }
-      };
-
-      window.addEventListener(
-        "error",
-        (e) => {
-          const t = e.target;
-          if (t && t.tagName === "SCRIPT" && t.src) msgs.push("No se pudo cargar el script: " + t.src);
-          else if (t && t.tagName === "LINK" && t.href) msgs.push("No se pudo cargar el estilo: " + t.href);
-          else msgs.push("Error en la página: " + (e.message || "desconocido"));
-          showCard(
-            "La página no pudo cargar",
-            msgs.join("<br><br>") +
-              "<br><br>Haz una recarga forzada (Ctrl + Shift + R). Si persiste, copia y pega este mensaje."
-          );
-        },
-        true
-      );
-      window.addEventListener("unhandledrejection", (e) => {
-        msgs.push(
-          "Proceso fallido: " + (e.reason && e.reason.message ? e.reason.message : String(e.reason))
-        );
-        showCard("La página no pudo cargar", msgs.join("<br><br>"));
-      });
-
-      const poll = setInterval(() => {
-        const root = document.getElementById("root");
-        if (root && root.children.length > 0) {
-          clearInterval(poll);
-          clearTimeout(boot);
-          if (fallback) fallback.remove();
-        }
-      }, 200);
-
-      const boot = setTimeout(async () => {
-        clearInterval(poll);
-        const report = [];
-        const probe = async (url, kind) => {
-          try {
-            const r = await fetch(url, { method: "GET" });
-            report.push(kind + " " + url + " → HTTP " + r.status);
-          } catch {
-            report.push(kind + " " + url + " → fallo de red o CORS");
-          }
-        };
-        for (const s of document.querySelectorAll('script[type="module"][src]')) {
-          if (!s.src.startsWith("data:")) await probe(s.src, "JS");
-        }
-        for (const l of document.querySelectorAll('link[rel="stylesheet"][href]')) {
-          if (!l.href.includes("fonts.g")) await probe(l.href, "CSS");
-        }
-        showCard(
-          "Diagnóstico Caituus",
-          (msgs.length ? msgs.join("<br><br>") + "<br><br>" : "") +
-            "La aplicación no se montó después de 9 segundos.<br><br>" +
-            "Estado de los recursos:<br>" +
-            (report.join("<br>") || "No se detectaron recursos externos") +
-            (window.__caituusShim && window.__caituusShim.length
-              ? "<br><br>(Se intentó recarga con rutas relativas: " +
-                window.__caituusShim.length +
-                " recursos)"
-              : "") +
-            "<br><br>Haz una recarga forzada (Ctrl + Shift + R). Si persiste, copia y pega TODO este mensaje."
-        );
-      }, 9000);
-    </script>
-  </head>
-  <body>
-    <div id="root"></div>
-    <div id="boot-fallback" role="status" aria-live="polite">
-      <div id="boot-card">
-        <svg class="boot-leaf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-          <path d="M7.2 4.6c4.4-2.6 9.6-1 11.8 3s.4 9.4-4 12-9.6 1-11.8-3-.4-9.4 4-12Z" />
-          <path d="M8.4 5.4c2.4 1.8 2 4.6 3.9 6.8s4.8 2.6 5.2 5.8" />
-        </svg>
-        <h1>Cargando Caituus…</h1>
-        <p>Preparando la tienda de productos esenciales de cannabis.</p>
+        padding: 24px;
+      "
+    >
+      <svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="#9cc184" stroke-width="1.4" stroke-linecap="round">
+        <path d="M7.2 4.6c4.4-2.6 9.6-1 11.8 3s.4 9.4-4 12-9.6 1-11.8-3-.4-9.4 4-12Z" />
+        <path d="M8.4 5.4c2.4 1.8 2 4.6 3.9 6.8s4.8 2.6 5.2 5.8" />
+      </svg>
+      <div
+        style="
+          font-family: 'Lora', serif;
+          font-size: 26px;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+        "
+      >
+        Caituus
       </div>
+      <div
+        style="
+          width: 46px;
+          height: 46px;
+          border-radius: 50%;
+          border: 3px solid rgba(156, 193, 132, 0.25);
+          border-top-color: #e8bb62;
+          animation: caituus-spin 0.9s linear infinite;
+        "
+      ></div>
+      <div style="font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 0.2em; color: #a3a08c">
+        CARGANDO LA VITRINA…
+      </div>
+      <style>
+        @keyframes caituus-spin {
+          to {
+            transform: rotate(360deg);
+          }
+        }
+      </style>
     </div>
-    <script type="module" src="/src/main.tsx"></script>
+
+    <script>
+      (function () {
+        var boot = document.getElementById("app-loader");
+        var done = false;
+        function finish() {
+          if (done) return;
+          done = true;
+          if (boot && boot.parentNode) boot.parentNode.removeChild(boot);
+        }
+        window.__CAITUUS_MOUNTED__ = finish;
+
+        function diag(title, detail) {
+          if (!boot) return;
+          boot.innerHTML =
+            '<div style="max-width:540px;border:1px solid rgba(198,98,69,.5);border-radius:12px;padding:26px;background:#131a12">' +
+            '<div style="font-family:Georgia,serif;font-size:20px;color:#f1ecdc">' +
+            title +
+            "</div>" +
+            '<div style="margin-top:12px;font-family:monospace;font-size:12px;line-height:1.7;color:#e07f5c;white-space:pre-wrap;text-align:left">' +
+            detail +
+            "</div>" +
+            '<div style="margin-top:14px;font-size:12px;color:#a3a08c">Recarga con Ctrl + Shift + R · Si persiste, copia este mensaje y compártelo.</div>' +
+            "</div>";
+        }
+        window.__CAITUUS_DIAG__ = diag;
+
+        window.addEventListener("error", function (e) {
+          var t = e.target;
+          if (t && (t.tagName === "SCRIPT" || t.tagName === "LINK")) {
+            var el = t;
+            function probe(url) {
+              fetch(url, { method: "HEAD", mode: "no-cors" })
+                .then(function () {
+                  diag(
+                    "Un recurso no se pudo ejecutar",
+                    "El archivo existe pero el navegador no pudo ejecutarlo:\n" +
+                      (el.src || el.href) +
+                      "\n\nPosible bloqueo del navegador o de la red. Prueba otro navegador o recarga forzada."
+                  );
+                })
+                .catch(function () {
+                  diag(
+                    "Un recurso no se encontró",
+                    "No se pudo descargar:\n" +
+                      (el.src || el.href) +
+                      "\n\nPresiona «Update branch» de nuevo en el entorno para resincronizar los archivos."
+                  );
+                });
+            }
+            probe(el.src || el.href);
+          } else {
+            finish();
+            if (window.__CAITUUS_SHOW_RUNTIME__) window.__CAITUUS_SHOW_RUNTIME__(e.error || e.message);
+          }
+        }, true);
+
+        setTimeout(function () {
+          if (done) return;
+          var scripts = Array.prototype.slice
+            .call(document.querySelectorAll("script[src]"))
+            .map(function (s) {
+              return (s.src.indexOf("/assets/") !== -1 || s.src.indexOf("assets/") !== -1 ? "JS  " : "otro ") + s.src;
+            })
+            .join("\n");
+          diag(
+            "La aplicación no se montó después de 8 segundos",
+            "Recursos detectados en la página:\n" +
+              (scripts || "(ningún script encontrado)") +
+              "\n\nCausas probables:\n1) La vista previa necesita recarga forzada (Ctrl + Shift + R).\n2) El entorno no entregó el JavaScript compilado: presiona «Update branch» y recarga.\n3) La vista previa sirve desde otra ruta: el cargador de respaldo ya intentó rutas relativas."
+          );
+        }, 8000);
+      })();
+    </script>
+
+    <script>
+      /* Cargador de respaldo: si la app no monta, reintenta con rutas relativas */
+      (function () {
+        function rel(path) {
+          var l = window.location;
+          var base = l.pathname.replace(/\/[^/]*\.[^/]*$/, "").replace(/\/$/, "");
+          return base + "/" + path;
+        }
+        function inject(type, src, attrs) {
+          var el = document.createElement(type);
+          if (type === "script") {
+            el.src = src;
+            el.type = "module";
+          } else {
+            el.href = src;
+            el.rel = "stylesheet";
+          }
+          if (attrs) attrs(el);
+          document.head.appendChild(el);
+          return el;
+        }
+        window.addEventListener("load", function () {
+          setTimeout(function () {
+            var app = document.getElementById("root");
+            if (app && app.children.length) return;
+            /* Reintenta los recursos compilados con rutas relativas */
+            Array.prototype.slice.call(document.querySelectorAll('script[src*="assets"]')).forEach(function (s) {
+              var m = s.src.match(/assets\/[^/?#]+/);
+              if (m) inject("script", rel(m[0]));
+            });
+            Array.prototype.slice.call(document.querySelectorAll('link[rel="stylesheet"][href*="assets"]')).forEach(function (l) {
+              var m = l.href.match(/assets\/[^/?#]+/);
+              if (m) inject("link", rel(m[0]));
+            });
+          }, 2500);
+        });
+      })();
+    </script>
   </body>
 </html>

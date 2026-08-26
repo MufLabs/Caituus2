@@ -34,6 +34,11 @@ export const CATEGORY_LABELS: Record<Category, string> = {
   extractos: "Extracto",
 };
 
+/* Imágenes reales del repositorio MufLabs/Caituus (carpeta /images).
+   Si una URL no estuviera disponible, cada componente usa la ilustración
+   local de respaldo automáticamente. */
+const REPO_IMAGES = "https://raw.githubusercontent.com/MufLabs/Caituus/main/images";
+
 export interface Product {
   id: string;
   name: string;
@@ -43,6 +48,7 @@ export interface Product {
   compareAt?: number;
   category: Category;
   image: string;
+  fallback: string;
   content: string;
   kind: string;
   thc: string;
@@ -79,7 +85,8 @@ export const PRODUCTS: Product[] = [
     description: CBD_DESCRIPTION,
     price: 103500,
     category: "aceites",
-    image: aceite25,
+    image: `${REPO_IMAGES}/cajas-25-gotas-2.png`,
+    fallback: aceite25,
     content: "25 ml · frasco gotero",
     kind: "Rico en CBD · espectro completo",
     thc: "THC en concentración muy baja",
@@ -103,7 +110,8 @@ export const PRODUCTS: Product[] = [
     description: CBD_DESCRIPTION,
     price: 187000,
     category: "aceites",
-    image: aceite50,
+    image: `${REPO_IMAGES}/caja-y-botella-50-ml-nueva.jpg`,
+    fallback: aceite50,
     content: "50 ml · caja + frasco gotero",
     kind: "Rico en CBD · espectro completo",
     thc: "THC en concentración muy baja",
@@ -127,7 +135,8 @@ export const PRODUCTS: Product[] = [
     description: CBD_DESCRIPTION,
     price: 359000,
     category: "aceites",
-    image: aceite100,
+    image: `${REPO_IMAGES}/100-ml-nuevo.jpg`,
+    fallback: aceite100,
     content: "100 ml · frasco gotero familiar",
     kind: "Rico en CBD · espectro completo",
     thc: "THC en concentración muy baja",
@@ -152,7 +161,8 @@ export const PRODUCTS: Product[] = [
       "Cuando tus amigos de cuatro patas sufren convulsiones, tienen dolores articulares por artritis o artrosis, tienen cáncer o por su vejez se enferman y sufren dolores, puedes tratarlos y darles una mejor vida con nuestro Aceite de Cannabis (CBD) para Mascotas. Extracto puro de CBD con aceite de oliva extra virgen, fabricado con las mejores cepas: producto 100% natural, que no causa adicción ni dependencia ni efectos psicoactivos, y no afecta el hígado, los riñones ni el tracto gastrointestinal. Este producto no es un medicamento.",
     price: 208000,
     category: "mascotas",
-    image: mascotas50,
+    image: `${REPO_IMAGES}/doble-perrito-50ml.jpg`,
+    fallback: mascotas50,
     content: "50 ml · frasco ámbar, tapa de seguridad y gotero",
     kind: "Full spectrum (CBD · THC · CBG · CBN)",
     thc: "Sin efecto psicoactivo",
@@ -184,7 +194,8 @@ export const PRODUCTS: Product[] = [
       "Extracto rico en THC y CBD en proporción 2:1. Producto 100% natural, de plantas orgánicas, cuya concentración de THC no excede los límites máximos permitidos por los decretos del gobierno nacional. No causa efectos psicoactivos por el contenido de CBD en su composición, ni dependencia ni adicción. Es antiespasmódico, broncodilatador, antioxidante, analgésico y antiinflamatorio: muy efectivo como coadyuvante en tratamientos contra el cáncer, los síntomas del Alzheimer y el Parkinson, la epilepsia, el insomnio, la fibromialgia, dolores crónicos y diferentes neuropatías. Puede causar ansiedad en algunas personas: recomendamos acompañarlo con el Aceite Esencial CBD. Este producto no es un medicamento — por favor consulte a su médico.",
     price: 429600,
     category: "extractos",
-    image: extractoThc,
+    image: `${REPO_IMAGES}/extract_orig.jpg`,
+    fallback: extractoThc,
     content: "20 ml · frasco ámbar gotero",
     kind: "Extracto THC:CBD (2:1)",
     thc: "Solo mayores de 18 años",
@@ -216,7 +227,8 @@ export const PRODUCTS: Product[] = [
       "La presentación más potente de los productos derivados de la planta. Extraído de las cepas más puras y con mayor concentración de CBD, THC, CBG, CBN, otros cannabinoides y terpenos. Tiene un efecto muy importante en la regeneración celular y es muy efectivo como apoyo en enfermedades graves como cáncer, Parkinson y Alzheimer, además de epilepsia, estrés, depresión, esclerosis múltiple, dolores severos de cabeza, afecciones digestivas, artritis, artrosis, dolores crónicos y fibromialgia. Puede usarse tópicamente en problemas de la piel, ulceraciones y llagas. No recomendada su administración en pacientes con tensión baja o ciertos tipos de esquizofrenia; precaución en embarazo o lactancia. Este producto no es un medicamento — por favor consulte a su médico.",
     price: 150000,
     category: "extractos",
-    image: extractoJeringa,
+    image: `${REPO_IMAGES}/jeringasindica600px-orig_orig.png`,
+    fallback: extractoJeringa,
     content: "5 ml · jeringa dosificadora",
     kind: "Indica / Sativa",
     thc: "Solo mayores de 18 años",
@@ -314,8 +326,21 @@ export const SOCIALS = [
   { label: "X (Twitter)", handle: "@caituus" },
 ];
 
-/* Ilustraciones locales usadas en las secciones */
+/* Fotografías reales del repositorio + ilustraciones locales de respaldo */
 export const SECTION_IMAGES = {
+  lineup: `${REPO_IMAGES}/todas-las-cajas-fondo-blanco.png`,
+  lab: `${REPO_IMAGES}/6-laboratory-test-tubes-orig_orig.png`,
+  blackBottle: `${REPO_IMAGES}/frasco-aceite-negro-solo8x6-orig_orig.png`,
+  boxesDark: `${REPO_IMAGES}/cajas-cbd-fondo.png`,
+  sativaIndica: `${REPO_IMAGES}/sativa-indica.jpg`,
+  cat4: `${REPO_IMAGES}/gatica4_orig.jpg`,
+  cat5: `${REPO_IMAGES}/gatica5_orig.jpg`,
+  cat6: `${REPO_IMAGES}/gatica6_orig.jpg`,
+  dosingCat: `${REPO_IMAGES}/dosing-cat-mod-orig_orig.jpg`,
+  heroBg: `${REPO_IMAGES}/background-images/1366250879.jpg`,
+};
+
+export const SECTION_FALLBACKS: Record<string, string> = {
   lineup: imgLineup,
   lab: imgLab,
   blackBottle: imgBottle,

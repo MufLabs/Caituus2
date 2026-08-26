@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { PAYMENT_METHODS, PAY_PHONE, PRODUCTS, PURCHASE_TERMS, money } from "../data/products";
+import SafeImg from "./SafeImg";
 import { useShop } from "../state/shop";
 import { ArrowLeftIcon, CheckIcon, LockIcon, TruckIcon, XIcon } from "./icons";
 
@@ -175,7 +176,7 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
                     return (
                       <li key={l.productId} className="flex items-center justify-between gap-3 text-sm">
                         <span className="flex items-center gap-3">
-                          <img src={p.image} alt="" className="h-10 w-9 rounded border border-moss-700 object-cover" />
+                          <SafeImg src={p.image} fallback={p.fallback} alt="" className="photo-plate h-10 w-9 rounded border border-moss-700 object-cover" />
                           <span className="text-cream-100">
                             {p.name} <span className="font-mono text-xs text-cream-300">× {l.qty}</span>
                           </span>

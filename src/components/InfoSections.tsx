@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { LEGAL, SECTION_IMAGES } from "../data/products";
+import { LEGAL, SECTION_FALLBACKS, SECTION_IMAGES } from "../data/products";
 import Reveal from "./Reveal";
+import SafeImg from "./SafeImg";
 import {
   ArrowRightIcon,
   BankIcon,
@@ -115,8 +116,9 @@ export default function InfoSections({ onBrowseMascotas }: InfoSectionsProps) {
 
               <Reveal delay={100}>
                 <figure className="overflow-hidden rounded-lg border border-moss-700 bg-moss-900">
-                  <img
+                  <SafeImg
                     src={SECTION_IMAGES.lab}
+                    fallback={SECTION_FALLBACKS.lab}
                     alt="Tubos de ensayo de laboratorio: análisis de cada lote Caituus"
                     className="h-52 w-full object-cover transition-transform duration-700 hover:scale-[1.03] sm:h-60"
                     loading="lazy"
@@ -142,8 +144,9 @@ export default function InfoSections({ onBrowseMascotas }: InfoSectionsProps) {
 
               <Reveal delay={220}>
                 <figure className="overflow-hidden rounded-lg border border-moss-700 bg-moss-900">
-                  <img
+                  <SafeImg
                     src={SECTION_IMAGES.sativaIndica}
+                    fallback={SECTION_FALLBACKS.sativaIndica}
                     alt="Hojas de cannabis Sativa e Indica"
                     className="h-44 w-full object-cover transition-transform duration-700 hover:scale-[1.03] sm:h-52"
                     loading="lazy"
@@ -194,8 +197,9 @@ export default function InfoSections({ onBrowseMascotas }: InfoSectionsProps) {
 
               <Reveal delay={140}>
                 <figure className="mt-5 overflow-hidden rounded-lg border border-moss-700 bg-moss-900">
-                  <img
+                  <SafeImg
                     src={SECTION_IMAGES.blackBottle}
+                    fallback={SECTION_FALLBACKS.blackBottle}
                     alt="Frasco ámbar con gotero y gota de aceite esencial de CBD"
                     className="h-56 w-full object-cover transition-transform duration-700 hover:scale-[1.03] sm:h-64"
                     loading="lazy"
@@ -210,8 +214,9 @@ export default function InfoSections({ onBrowseMascotas }: InfoSectionsProps) {
 
           <Reveal delay={100}>
             <div className="relative mt-10 overflow-hidden rounded-lg border border-moss-700">
-              <img
+              <SafeImg
                 src={SECTION_IMAGES.boxesDark}
+                fallback={SECTION_FALLBACKS.boxesDark}
                 alt="Cajas de la línea de aceites de CBD Caituus sobre fondo oscuro"
                 className="h-56 w-full object-cover sm:h-64"
                 loading="lazy"
@@ -264,7 +269,7 @@ export default function InfoSections({ onBrowseMascotas }: InfoSectionsProps) {
             </Reveal>
             <Reveal delay={120} className="lg:col-span-5">
               <figure className="overflow-hidden rounded-lg border border-moss-700 bg-moss-850">
-                <img src={SECTION_IMAGES.dosingCat} alt="Gotero dosificando aceite de CBD sobre la comida de un gato" className="h-56 w-full object-cover transition-transform duration-700 hover:scale-[1.04] sm:h-64" loading="lazy" />
+                <SafeImg src={SECTION_IMAGES.dosingCat} fallback={SECTION_FALLBACKS.dosingCat} alt="Gotero dosificando aceite de CBD sobre la comida de un gato" className="h-56 w-full object-cover transition-transform duration-700 hover:scale-[1.04] sm:h-64" loading="lazy" />
                 <figcaption className="px-5 py-3 font-mono text-[10px] tracking-[0.18em] text-cream-300 uppercase">
                   Directo en la boca o mezclado con su comida
                 </figcaption>
@@ -365,9 +370,9 @@ export default function InfoSections({ onBrowseMascotas }: InfoSectionsProps) {
           <div className="mt-14 grid items-center gap-8 lg:grid-cols-12">
             <Reveal className="order-2 lg:order-1 lg:col-span-4">
               <div className="grid grid-cols-3 gap-3">
-                <img src={SECTION_IMAGES.cat4} alt="Gata tranquila con aceite de CBD" className="h-28 w-full rounded-lg border border-moss-700 object-cover transition-transform duration-500 hover:-translate-y-1 sm:h-36" loading="lazy" />
-                <img src={SECTION_IMAGES.cat5} alt="Gato descansando profundamente" className="h-28 w-full rounded-lg border border-moss-700 object-cover transition-transform duration-500 hover:-translate-y-1 sm:h-36" loading="lazy" />
-                <img src={SECTION_IMAGES.cat6} alt="Carita de gato sana y alerta" className="h-28 w-full rounded-lg border border-moss-700 object-cover transition-transform duration-500 hover:-translate-y-1 sm:h-36" loading="lazy" />
+                <SafeImg src={SECTION_IMAGES.cat4} fallback={SECTION_FALLBACKS.cat4} alt="Gata tranquila con aceite de CBD" className="h-28 w-full rounded-lg border border-moss-700 object-cover transition-transform duration-500 hover:-translate-y-1 sm:h-36" loading="lazy" />
+                <SafeImg src={SECTION_IMAGES.cat5} fallback={SECTION_FALLBACKS.cat5} alt="Gato descansando profundamente" className="h-28 w-full rounded-lg border border-moss-700 object-cover transition-transform duration-500 hover:-translate-y-1 sm:h-36" loading="lazy" />
+                <SafeImg src={SECTION_IMAGES.cat6} fallback={SECTION_FALLBACKS.cat6} alt="Carita de gato sana y alerta" className="h-28 w-full rounded-lg border border-moss-700 object-cover transition-transform duration-500 hover:-translate-y-1 sm:h-36" loading="lazy" />
               </div>
             </Reveal>
             <Reveal delay={120} className="order-1 lg:order-2 lg:col-span-8">

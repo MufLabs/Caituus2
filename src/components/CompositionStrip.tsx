@@ -17,7 +17,7 @@ const BLOCKS = [
   {
     icon: LeafIcon,
     title: "Terpenos",
-    copy: "Nuestros productos también contienen terpenos, incluyendo Pineno, Cariofileno, Mirceno y Linalol, que se unen a receptores en el cuerpo humano logrando una variedad de beneficios para la salud.",
+    copy: "También contienen terpenos — Pineno, Cariofileno, Mirceno y Linalol — que se unen a receptores en el cuerpo humano logrando una variedad de beneficios para la salud.",
     chips: ["Pineno", "Cariofileno", "Mirceno", "Linalol"],
   },
   {
@@ -30,63 +30,51 @@ const BLOCKS = [
 
 export default function CompositionStrip() {
   return (
-    <section className="border-b border-moss-700/70">
-      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+    <section className="relative border-y border-moss-700/70 bg-moss-850/60">
+      <LeafIcon className="pointer-events-none absolute top-1/2 -right-10 h-52 w-52 -translate-y-1/2 rotate-[18deg] text-moss-800" strokeWidth={1} />
+      <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
         <Reveal>
           <div className="flex flex-wrap items-end justify-between gap-4">
-            <h2 className="max-w-2xl font-display text-4xl leading-[1.02] font-medium text-cream-100 sm:text-5xl">
-              Todo lo que tienen <em className="text-leaf-400">nuestros productos.</em>
-            </h2>
-            <p className="font-mono text-[11px] tracking-[0.2em] text-amber-400 uppercase">
-              Ácidos grasos esenciales · y cero químicos !!
+            <div>
+              <p className="font-mono text-[11px] tracking-[0.28em] text-amber-400 uppercase">La fórmula completa</p>
+              <h2 className="mt-2 max-w-2xl font-display text-4xl leading-[1.02] font-medium text-cream-100 sm:text-5xl">
+                Todo lo que tienen <em className="text-leaf-300">nuestros productos.</em>
+              </h2>
+            </div>
+            <p className="max-w-xs font-mono text-[11px] leading-relaxed tracking-[0.12em] text-cream-300 uppercase">
+              Ácidos grasos esenciales… <span className="text-amber-300">¡y cero químicos!</span>
             </p>
           </div>
         </Reveal>
 
-        <div className="mt-10 grid gap-px overflow-hidden rounded-lg border border-moss-700 bg-moss-700 sm:grid-cols-2 lg:grid-cols-4">
+        <ol className="mt-10 divide-y divide-moss-700 border-y border-moss-700">
           {BLOCKS.map((b, i) => (
-            <Reveal key={b.title} delay={i * 80} className="h-full">
-              <article className="group flex h-full flex-col bg-moss-850 p-6 transition-colors hover:bg-moss-800">
-                <span className="grid h-11 w-11 place-items-center rounded-md border border-moss-600 bg-moss-900 text-amber-400 transition-colors group-hover:border-amber-500/60">
-                  <b.icon className="h-5 w-5" />
+            <Reveal key={b.title} delay={i * 80}>
+              <li className="group grid gap-4 py-7 transition-colors hover:bg-moss-800/60 sm:grid-cols-[90px_56px_1.2fr_auto] sm:items-start sm:gap-6 sm:px-4">
+                <span className="font-display text-5xl leading-none text-moss-600 italic transition-colors duration-300 group-hover:text-amber-400 sm:text-6xl">
+                  {String(i + 1).padStart(2, "0")}
                 </span>
-                <h3 className="mt-4 font-display text-[1.4rem] leading-snug font-semibold text-cream-100">
-                  {b.title}
-                </h3>
-                <p className="mt-2 flex-1 text-[13px] leading-relaxed text-cream-300">{b.copy}</p>
-                <div className="mt-4 flex flex-wrap gap-1.5">
+                <span className="grid h-12 w-12 place-items-center rounded-md border border-moss-600 bg-moss-900 text-amber-400 transition-colors group-hover:border-amber-500/60">
+                  <b.icon className="h-5.5 w-5.5" />
+                </span>
+                <div>
+                  <h3 className="font-display text-2xl font-semibold text-cream-100">{b.title}</h3>
+                  <p className="mt-1.5 max-w-2xl text-[14px] leading-relaxed text-cream-300">{b.copy}</p>
+                </div>
+                <div className="flex flex-wrap gap-1.5 sm:max-w-[220px] sm:justify-end">
                   {b.chips.map((c) => (
-                    <span key={c} className="rounded-full border border-moss-600 bg-moss-900 px-2.5 py-1 font-mono text-[10px] tracking-[0.1em] text-leaf-300 uppercase">
+                    <span
+                      key={c}
+                      className="rounded-full border border-moss-600 bg-moss-900 px-3 py-1.5 font-mono text-[10px] tracking-[0.12em] text-leaf-300 uppercase transition-colors group-hover:border-leaf-500/50"
+                    >
                       {c}
                     </span>
                   ))}
                 </div>
-              </article>
+              </li>
             </Reveal>
           ))}
-        </div>
-
-        <Reveal delay={120}>
-          <blockquote className="relative mt-12 overflow-hidden rounded-lg border border-moss-700 bg-moss-900 px-7 py-10 text-center sm:px-14">
-            <LeafIcon className="pointer-events-none absolute -top-8 -left-8 h-40 w-40 rotate-[-20deg] text-moss-800" strokeWidth={1} />
-            <LeafIcon className="pointer-events-none absolute -right-8 -bottom-10 h-44 w-44 rotate-[160deg] text-moss-800" strokeWidth={1} />
-            <p className="font-mono text-[11px] tracking-[0.28em] text-amber-400 uppercase">Nuestra promesa</p>
-            <p className="mx-auto mt-4 max-w-3xl font-display text-3xl leading-snug font-medium text-cream-100 sm:text-4xl">
-              “Siéntete mejor, <em className="text-amber-300">sin estar ‘high’</em>.”
-            </p>
-            <p className="mx-auto mt-5 max-w-2xl text-[15px] leading-relaxed text-cream-200">
-              Para sentirte mejor, tener una vida activa y normal, necesitas que tu mente se sienta
-              clara, despejada y activa. Por eso nuestros productos{" "}
-              <strong className="text-cream-100">no son medicamentos</strong> ni te causarán ningún
-              efecto que altere tu realidad o nuble tu mente; no te generarán dependencia ni
-              adicción — pero sí te dejarán una sensación de bienestar y mejoría en tu cuerpo que
-              hace tiempo no tenías.
-            </p>
-            <p className="mt-5 font-mono text-[10px] tracking-[0.18em] text-cream-300 uppercase">
-              THC inferior al 0.2% · seguro, potente y eficaz
-            </p>
-          </blockquote>
-        </Reveal>
+        </ol>
       </div>
     </section>
   );
