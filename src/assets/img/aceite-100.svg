@@ -1,0 +1,49 @@
+<svg viewBox="0 0 480 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Aceite Esencial CBD 100 ml">
+  <defs>
+    <linearGradient id="vidrio" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8a5316"/>
+      <stop offset=".45" stop-color="#d29a3f"/>
+      <stop offset=".75" stop-color="#a86a20"/>
+      <stop offset="1" stop-color="#6e4210"/>
+    </linearGradient>
+    <radialGradient id="fondo" cx=".5" cy=".3" r="1">
+      <stop offset="0" stop-color="#1c2b1e"/>
+      <stop offset="1" stop-color="#0f1810"/>
+    </radialGradient>
+    <path id="lf" d="M0 0C-6.5 -13 -6.5 -33 0 -52C6.5 -33 6.5 -13 0 0Z"/>
+    <g id="hoja">
+      <use href="#lf" fill="#4c7f53"/>
+      <use href="#lf" transform="rotate(32) scale(.85)" fill="#4c7f53"/>
+      <use href="#lf" transform="rotate(-32) scale(.85)" fill="#4c7f53"/>
+      <use href="#lf" transform="rotate(64) scale(.62)" fill="#4c7f53"/>
+      <use href="#lf" transform="rotate(-64) scale(.62)" fill="#4c7f53"/>
+      <rect x="-1.4" y="0" width="2.8" height="14" rx="1.4" fill="#37563c"/>
+    </g>
+  </defs>
+  <rect width="480" height="600" fill="url(#fondo)"/>
+  <ellipse cx="252" cy="496" rx="160" ry="18" fill="#000" opacity=".3"/>
+  <!-- frasco acompañante pequeño -->
+  <g transform="translate(338 292) scale(.52)">
+    <rect x="0" y="40" width="128" height="250" rx="18" fill="url(#vidrio)"/>
+    <rect x="45" y="0" width="38" height="46" fill="#7a4a12"/>
+    <rect x="38" y="-34" width="52" height="40" rx="8" fill="#20261b"/>
+    <rect x="14" y="120" width="100" height="96" rx="6" fill="#f6efdd"/>
+    <rect x="14" y="176" width="100" height="22" fill="#3f7189"/>
+  </g>
+  <!-- frasco grande -->
+  <rect x="150" y="172" width="182" height="310" rx="22" fill="url(#vidrio)"/>
+  <path d="M150 200c0-30 36-44 91-44s91 14 91 44" fill="url(#vidrio)"/>
+  <rect x="220" y="110" width="42" height="56" fill="#7a4a12"/>
+  <rect x="210" y="66" width="62" height="50" rx="9" fill="#20261b"/>
+  <rect x="210" y="77" width="62" height="4" fill="#333c2c"/>
+  <rect x="228" y="38" width="26" height="32" rx="12" fill="#2c3527"/>
+  <rect x="166" y="192" width="15" height="268" rx="7.5" fill="#fff" opacity=".16"/>
+  <!-- etiqueta -->
+  <rect x="166" y="252" width="150" height="158" rx="6" fill="#f6efdd"/>
+  <text x="241" y="275" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" letter-spacing="3" fill="#37563c">CAITUUS</text>
+  <use href="#hoja" transform="translate(241 330) scale(.68)"/>
+  <rect x="166" y="350" width="150" height="28" fill="#3f7189"/>
+  <text x="241" y="370" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" letter-spacing="1" fill="#f6efdd">100 ml</text>
+  <rect x="184" y="386" width="114" height="4.5" rx="2.25" fill="#b9b09a"/>
+  <rect x="196" y="395" width="90" height="4.5" rx="2.25" fill="#cfc7b1"/>
+</svg>

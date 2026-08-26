@@ -1,0 +1,41 @@
+<svg viewBox="0 0 480 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Aceite Esencial CBD 25 ml">
+  <defs>
+    <linearGradient id="vidrio" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#8a5316"/>
+      <stop offset=".45" stop-color="#d29a3f"/>
+      <stop offset=".75" stop-color="#a86a20"/>
+      <stop offset="1" stop-color="#6e4210"/>
+    </linearGradient>
+    <radialGradient id="fondo" cx=".5" cy=".3" r="1">
+      <stop offset="0" stop-color="#1c2b1e"/>
+      <stop offset="1" stop-color="#0f1810"/>
+    </radialGradient>
+    <path id="lf" d="M0 0C-6.5 -13 -6.5 -33 0 -52C6.5 -33 6.5 -13 0 0Z"/>
+    <g id="hoja">
+      <use href="#lf" fill="#4c7f53"/>
+      <use href="#lf" transform="rotate(32) scale(.85)" fill="#4c7f53"/>
+      <use href="#lf" transform="rotate(-32) scale(.85)" fill="#4c7f53"/>
+      <use href="#lf" transform="rotate(64) scale(.62)" fill="#4c7f53"/>
+      <use href="#lf" transform="rotate(-64) scale(.62)" fill="#4c7f53"/>
+      <rect x="-1.4" y="0" width="2.8" height="14" rx="1.4" fill="#37563c"/>
+    </g>
+  </defs>
+  <rect width="480" height="600" fill="url(#fondo)"/>
+  <ellipse cx="240" cy="482" rx="128" ry="17" fill="#000" opacity=".3"/>
+  <!-- frasco -->
+  <rect x="176" y="212" width="128" height="258" rx="18" fill="url(#vidrio)"/>
+  <path d="M176 236c0-26 24-38 64-38s64 12 64 38" fill="url(#vidrio)"/>
+  <rect x="221" y="158" width="38" height="50" fill="#7a4a12"/>
+  <rect x="212" y="118" width="56" height="46" rx="9" fill="#20261b"/>
+  <rect x="212" y="128" width="56" height="4" fill="#333c2c"/>
+  <rect x="228" y="92" width="24" height="30" rx="11" fill="#2c3527"/>
+  <rect x="190" y="232" width="13" height="216" rx="6.5" fill="#fff" opacity=".16"/>
+  <!-- etiqueta -->
+  <rect x="189" y="286" width="102" height="132" rx="6" fill="#f6efdd"/>
+  <text x="240" y="306" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" letter-spacing="3" fill="#37563c">CAITUUS</text>
+  <use href="#hoja" transform="translate(240 356) scale(.62)"/>
+  <rect x="189" y="372" width="102" height="26" fill="#5d9463"/>
+  <text x="240" y="390" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" letter-spacing="1" fill="#f6efdd">25 ml</text>
+  <rect x="203" y="404" width="74" height="4.5" rx="2.25" fill="#b9b09a"/>
+  <rect x="211" y="412" width="58" height="4.5" rx="2.25" fill="#cfc7b1"/>
+</svg>

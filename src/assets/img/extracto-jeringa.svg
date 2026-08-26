@@ -1,0 +1,43 @@
+<svg viewBox="0 0 480 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Extracto Puro 5 ml Indica y Sativa">
+  <defs>
+    <radialGradient id="fondo" cx=".5" cy=".3" r="1">
+      <stop offset="0" stop-color="#1c2b1e"/>
+      <stop offset="1" stop-color="#0f1810"/>
+    </radialGradient>
+    <path id="lf" d="M0 0C-6.5 -13 -6.5 -33 0 -52C6.5 -33 6.5 -13 0 0Z"/>
+    <g id="hojaI">
+      <use href="#lf" fill="#37563c"/>
+      <use href="#lf" transform="rotate(30) scale(.88)" fill="#37563c"/>
+      <use href="#lf" transform="rotate(-30) scale(.88)" fill="#37563c"/>
+      <use href="#lf" transform="rotate(58) scale(.66)" fill="#37563c"/>
+      <use href="#lf" transform="rotate(-58) scale(.66)" fill="#37563c"/>
+    </g>
+    <g id="hojaS">
+      <use href="#lf" fill="#7fa365"/>
+      <use href="#lf" transform="rotate(36) scale(.8)" fill="#7fa365"/>
+      <use href="#lf" transform="rotate(-36) scale(.8)" fill="#7fa365"/>
+      <use href="#lf" transform="rotate(70) scale(.55)" fill="#7fa365"/>
+      <use href="#lf" transform="rotate(-70) scale(.55)" fill="#7fa365"/>
+    </g>
+  </defs>
+  <rect width="480" height="600" fill="url(#fondo)"/>
+  <ellipse cx="240" cy="496" rx="140" ry="15" fill="#000" opacity=".28"/>
+  <!-- hojas -->
+  <use href="#hojaI" transform="translate(118 420) scale(1.25)"/>
+  <use href="#hojaS" transform="translate(362 402) scale(1.2) rotate(12)"/>
+  <!-- jeringa -->
+  <g transform="translate(240 300) rotate(18)">
+    <rect x="-16" y="-150" width="32" height="210" rx="14" fill="#efe8d4" stroke="#c9c0a8" stroke-width="3"/>
+    <rect x="-16" y="-60" width="32" height="120" rx="12" fill="#cf9032"/>
+    <rect x="-16" y="-60" width="32" height="10" fill="#e8b45e"/>
+    <g stroke="#8d8670" stroke-width="2">
+      <path d="M-16 -120h10M-16 -95h10M-16 -70h10M-16 -45h10M-16 -20h10"/>
+    </g>
+    <rect x="-5" y="60" width="10" height="46" fill="#c9c0a8"/>
+    <rect x="-20" y="104" width="40" height="10" rx="5" fill="#c9c0a8"/>
+    <rect x="-26" y="-166" width="52" height="18" rx="6" fill="#c9c0a8"/>
+    <rect x="-2.5" y="-196" width="5" height="32" fill="#8d8670"/>
+    <path d="M0 -216c-5 8 -5 14 0 20c5 -6 5 -12 0 -20z" fill="#cf9032"/>
+  </g>
+  <text x="240" y="546" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="bold" letter-spacing="4" fill="#9dbe83">INDICA · SATIVA</text>
+</svg>

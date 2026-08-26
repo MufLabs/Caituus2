@@ -1,0 +1,38 @@
+<svg viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Análisis de laboratorio de cada lote">
+  <defs>
+    <radialGradient id="fondo" cx=".5" cy=".3" r="1">
+      <stop offset="0" stop-color="#1c2b1e"/><stop offset="1" stop-color="#0f1810"/>
+    </radialGradient>
+  </defs>
+  <rect width="480" height="360" fill="url(#fondo)"/>
+  <ellipse cx="240" cy="300" rx="180" ry="14" fill="#000" opacity=".3"/>
+  <!-- gradilla -->
+  <rect x="90" y="252" width="300" height="14" rx="7" fill="#2c3527"/>
+  <rect x="104" y="266" width="12" height="36" fill="#20261b"/>
+  <rect x="364" y="266" width="12" height="36" fill="#20261b"/>
+  <!-- tubos -->
+  <g>
+    <rect x="130" y="96" width="44" height="160" rx="22" fill="#f6efdd" opacity=".14"/>
+    <rect x="130" y="150" width="44" height="106" rx="22" fill="#7fa365"/>
+    <rect x="138" y="104" width="6" height="140" rx="3" fill="#fff" opacity=".25"/>
+    <circle cx="160" cy="190" r="4" fill="#cfe3bd"/><circle cx="148" cy="214" r="3" fill="#cfe3bd"/>
+  </g>
+  <g>
+    <rect x="218" y="70" width="44" height="186" rx="22" fill="#f6efdd" opacity=".14"/>
+    <rect x="218" y="140" width="44" height="116" rx="22" fill="#cf9032"/>
+    <rect x="226" y="78" width="6" height="166" rx="3" fill="#fff" opacity=".25"/>
+    <circle cx="248" cy="180" r="4" fill="#f2d7a0"/><circle cx="234" cy="206" r="3" fill="#f2d7a0"/>
+  </g>
+  <g>
+    <rect x="306" y="96" width="44" height="160" rx="22" fill="#f6efdd" opacity=".14"/>
+    <rect x="306" y="164" width="44" height="92" rx="22" fill="#37563c"/>
+    <rect x="314" y="104" width="6" height="140" rx="3" fill="#fff" opacity=".25"/>
+    <circle cx="336" cy="200" r="4" fill="#9dbe83"/>
+  </g>
+  <g stroke="#8d8670" stroke-width="2">
+    <path d="M130 130h12M130 160h12M130 190h12"/>
+    <path d="M218 110h12M218 145h12M218 180h12"/>
+    <path d="M306 130h12M306 165h12M306 200h12"/>
+  </g>
+  <text x="240" y="336" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" letter-spacing="4" fill="#8d8670">POTENCIA · PUREZA · METALES</text>
+</svg>

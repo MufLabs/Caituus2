@@ -1,0 +1,33 @@
+<svg viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Dosis de aceite CBD sobre la comida del gato">
+  <defs>
+    <radialGradient id="f" cx=".5" cy=".3" r="1"><stop offset="0" stop-color="#1e2d20"/><stop offset="1" stop-color="#0f1810"/></radialGradient>
+  </defs>
+  <rect width="480" height="360" fill="url(#f)"/>
+  <ellipse cx="240" cy="300" rx="180" ry="14" fill="#000" opacity=".3"/>
+  <!-- gato mirando el plato -->
+  <g transform="translate(120 0)">
+    <path d="M60 296c0 -78 30 -126 70 -126s72 48 72 126z" fill="#4b5344"/>
+    <circle cx="130" cy="140" r="44" fill="#4b5344"/>
+    <polygon points="98,110 108,74 130,98" fill="#4b5344"/>
+    <polygon points="162,110 152,74 130,98" fill="#4b5344"/>
+    <ellipse cx="116" cy="138" rx="7.5" ry="8.5" fill="#cf9032"/><circle cx="116" cy="139" r="3.4" fill="#232920"/>
+    <ellipse cx="146" cy="138" rx="7.5" ry="8.5" fill="#cf9032"/><circle cx="146" cy="139" r="3.4" fill="#232920"/>
+    <path d="M127 152l3 4l3 -4" stroke="#c08a6d" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <path d="M200 280c40 -6 54 -36 46 -66" stroke="#3d4a3a" stroke-width="16" fill="none" stroke-linecap="round"/>
+  </g>
+  <!-- plato con croquetas -->
+  <g transform="translate(340 268)">
+    <ellipse cx="0" cy="14" rx="64" ry="16" fill="#37563c"/>
+    <ellipse cx="0" cy="6" rx="64" ry="16" fill="#5d9463"/>
+    <ellipse cx="0" cy="4" rx="46" ry="11" fill="#8a5316"/>
+    <circle cx="-18" cy="0" r="6" fill="#a86a20"/><circle cx="0" cy="4" r="6" fill="#c98a2e"/><circle cx="18" cy="-1" r="6" fill="#a86a20"/><circle cx="8" cy="-5" r="5" fill="#8a5316"/>
+  </g>
+  <!-- gotero con gota cayendo -->
+  <g transform="translate(340 60)">
+    <rect x="-10" y="0" width="20" height="26" rx="9" fill="#2c3527"/>
+    <rect x="-14" y="22" width="28" height="34" rx="6" fill="#20261b"/>
+    <rect x="-4" y="56" width="8" height="46" fill="#efe8d4" opacity=".9"/>
+    <path d="M0 118c-6 9 -6 16 0 23c6 -7 6 -14 0 -23z" fill="#cf9032"/>
+    <path d="M0 158c-4 6 -4 11 0 16c4 -5 4 -10 0 -16z" fill="#cf9032" opacity=".7"/>
+  </g>
+</svg>
