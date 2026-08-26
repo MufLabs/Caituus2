@@ -41,7 +41,7 @@
   <rect x="190" y="360" width="104" height="26" fill="#cf9032"/>
   <text x="242" y="378" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" font-weight="bold" letter-spacing="1" fill="#232920">MASCOTAS</text>
   <rect x="204" y="393" width="76" height="4.5" rx="2.25" fill="#b9b09a"/>
-  <text x="242" y="410" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="bold" fill="#6e7563">50 ml · 0% THC</text>
+  <text x="242" y="410" text-anchor="middle" font-family="Arial, sans-serif" font-size="9" font-weight="bold" letter-spacing="1" fill="#6e7563">FULL SPECTRUM 25·50·100ml</text>
   <!-- pelotas -->
   <circle cx="120" cy="462" r="16" fill="#5d9463"/>
   <path d="M106 456c10 3 18 3 28 0" stroke="#37563c" stroke-width="2.5" fill="none"/>

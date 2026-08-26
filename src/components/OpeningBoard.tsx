@@ -47,9 +47,11 @@ export default function OpeningBoard() {
             <h1 className="mt-5 font-display text-[2.7rem] leading-[0.99] font-medium text-cream-100 sm:text-6xl xl:text-[5rem]">
               Productos esenciales
               <br />
-              <span className="text-leaf-400 italic">de cannabis</span> para tu piel,
+              de cannabis para
               <br />
-              tu salud… <em className="text-amber-400">y tus mascotas.</em>
+              <span className="text-leaf-400 italic">toda tu familia</span>…
+              <br />
+              <em className="text-amber-400">y tus mascotas.</em>
             </h1>
           </Reveal>
           <Reveal delay={180}>

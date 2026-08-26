@@ -94,6 +94,21 @@ export default function Footer({ onOpenProduct, onCategory }: FooterProps) {
               </button>
             </form>
 
+            <div className="mt-6 max-w-md rounded-lg border border-moss-700 bg-moss-850 p-4">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <p className="font-mono text-[9px] tracking-[0.2em] text-cream-300 uppercase">Nuestro horario</p>
+                  <p className="mt-1 text-[13px] leading-snug text-cream-100">Lunes — Viernes · 9 am – 5 pm</p>
+                  <p className="text-[13px] leading-snug text-cream-100">Sábado · 10 am – 1 pm</p>
+                </div>
+                <div>
+                  <p className="font-mono text-[9px] tracking-[0.2em] text-cream-300 uppercase">Escríbenos / Transfiere</p>
+                  <p className="mt-1 text-[13px] leading-snug text-cream-100">info@caituus.com</p>
+                  <p className="text-[13px] leading-snug text-cream-100">Nequi / Daviplata · 311 504 9615</p>
+                </div>
+              </div>
+            </div>
+
             <div className="mt-7">
               <p className="font-mono text-[10px] tracking-[0.22em] text-cream-300 uppercase">Síguenos</p>
               <div className="mt-3 flex flex-wrap items-center gap-2.5">
@@ -173,6 +188,10 @@ export default function Footer({ onOpenProduct, onCategory }: FooterProps) {
                 <CheckIcon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-leaf-400" /> 0% THC línea mascotas
               </li>
             </ul>
+            <p className="mt-4 rounded-md border border-clay-500/40 bg-clay-500/10 p-3 text-[11px] leading-relaxed font-semibold text-cream-200">
+              Por la naturaleza de nuestros productos, no se admiten devoluciones una vez enviados.
+              Asegúrese del producto que compra.
+            </p>
             <p className="mt-4 text-[11px] leading-relaxed text-cream-300 italic">{LEGAL.disclaimer}</p>
           </div>
         </div>

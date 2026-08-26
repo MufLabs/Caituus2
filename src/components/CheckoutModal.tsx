@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { PAYMENT_METHODS, PRODUCTS, PURCHASE_TERMS, money } from "../data/products";
+import { PAYMENT_METHODS, PAY_PHONE, PRODUCTS, PURCHASE_TERMS, money } from "../data/products";
 import { useShop } from "../state/shop";
 import { ArrowLeftIcon, CheckIcon, LockIcon, TruckIcon, XIcon } from "./icons";
 
@@ -285,6 +285,12 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
                       ? `Al confirmar, recibirás una notificación en ${methodMeta.label} por ${money(total)}. Acéptala en tu app para completar la compra.`
                       : `Al confirmar, iniciaremos la transferencia inmediata de ${money(total)} desde tu banco a través de Bre-B. Recibirás la confirmación en segundos.`}
                   </p>
+                  {methodMeta.kind === "push" && (
+                    <p className="mt-1.5 text-[11px] leading-relaxed text-cream-300">
+                      ¿Prefieres pagar directo? Transfiere a nuestro número{" "}
+                      <strong className="text-cream-100">{PAY_PHONE}</strong> y envíanos el comprobante por WhatsApp.
+                    </p>
+                  )}
                 </div>
               </section>
 
@@ -299,7 +305,11 @@ export default function CheckoutModal({ open, onClose }: CheckoutModalProps) {
                   Enviar solicitud de pago · {money(total)}
                 </button>
               </div>
-              <p className="mt-3 text-center font-mono text-[9px] tracking-[0.12em] text-cream-300 uppercase">
+              <p className="mt-3 rounded-md border border-clay-500/40 bg-clay-500/10 px-4 py-2.5 text-center text-[11px] leading-snug font-semibold text-cream-200">
+                Por la naturaleza de nuestros productos, no se admiten devoluciones una vez
+                enviados. Asegúrese del producto que compra.
+              </p>
+              <p className="mt-2 text-center font-mono text-[9px] tracking-[0.12em] text-cream-300 uppercase">
                 Demo — no se procesa ningún pago real
               </p>
             </div>

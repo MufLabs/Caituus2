@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import AgeGate from "./components/AgeGate";
 import CartDrawer from "./components/CartDrawer";
 import CheckoutModal from "./components/CheckoutModal";
+import CompositionStrip from "./components/CompositionStrip";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import InfoSections from "./components/InfoSections";
@@ -65,6 +66,8 @@ function AppContent() {
 
       <main>
         <OpeningBoard />
+
+        <CompositionStrip />
 
         <section id="productos" className="mx-auto max-w-7xl scroll-mt-24 px-4 pt-14 sm:px-6 lg:px-8 lg:pt-16">
           <Reveal>
